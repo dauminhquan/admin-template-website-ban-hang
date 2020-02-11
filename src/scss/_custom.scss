@@ -2,3 +2,26 @@
 .product-status {
   cursor: pointer;
 }
+.table-products tbody>tr{
+  border-left: 5px solid #ddd;
+}
+.table-products tbody>tr.product-variation{
+  border-left-color: #AAA;
+}
+.table-products thead{
+  text-align: center;
+  font-weight: bold;
+  background: linear-gradient(to bottom,#f8f8f8,#eee);
+}
+.table-products td>img{
+  width: 60px;
+}
+.table-products .table-sort-icon {
+  font-size: 10px;
+}
+.table-products .columns-table{
+  cursor: pointer;
+}
+.table-products thead th>input:first-child{
+  margin-left: 3px;
+}
