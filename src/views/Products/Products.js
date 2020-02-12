@@ -1,6 +1,18 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Badge, Card, CardBody, CardHeader, Col, Row, Table } from 'reactstrap';
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col, Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Row,
+  Table
+} from 'reactstrap';
 import ProductsHeader from "./ProductsHeader";
 import MqDivDropdown from "../../containers/Components/MqDivDropdown";
 import MqDivDropdownHead from "../../containers/Components/MqDivDropdownHead";
@@ -9,6 +21,10 @@ import ReactSelect from 'react-select';
 import { colourOptions } from '../../../src/containers/Components/docs/data';
 import makeAnimated from 'react-select/animated';
 import MqSelect from "../../containers/Components/MqSelect";
+import SuccessIcon from "../../containers/Components/SuccessIcon";
+import ErrorIcon from "../../containers/Components/ErrorIcon";
+import MqAlert from "../../containers/Components/MqAlert";
+import MqPagination from "../../containers/Components/MqPagination";
 const animatedComponents = makeAnimated();
 const COLUMNS = [
   {
@@ -96,7 +112,13 @@ class Users extends Component {
       showColumns: {
 
       },
-      selectedAll: false
+      selectedAll: false,
+      showModelDelete: false,
+      deleteItemStatus: false,
+      showAlertDeleteItemResult: true,
+      from: 1,
+      to: 20,
+      currentPage: 1
     }
     this.wrapperRef = React.createRef()
   }
@@ -113,7 +135,24 @@ class Users extends Component {
       return state
     })
   }
-
+  choosePage(page){
+    this.setState(state => {
+      state.currentPage = page
+      return state
+    })
+  }
+  changeShowModal(){
+    this.setState(state => {
+      state.showModelDelete = !state.showModelDelete
+      return state
+    })
+  }
+  cancelDeleteItem(){
+    this.setState(state => {
+      state.showModelDelete = false
+      return state
+    })
+  }
   createRandomProduct() {
     let p = []
     for(let i = 0 ; i< 5; i++){
@@ -231,6 +270,15 @@ class Users extends Component {
       return state
     })
   }
+  checkNoSelectedProducts(){
+    let keys = Object.keys(this.state.productsSelected)
+    for(let i = 0 ; i < keys.length ;i++){
+      if(this.state.productsSelected[keys[i]]){
+        return false
+      }
+    }
+    return true
+  }
   checkSelectedAll(productsSelected){
     let keys = Object.keys(productsSelected)
     for(let  i = 0 ; i < keys.length; i++){
@@ -253,6 +301,7 @@ class Users extends Component {
                   <div className="btn-group">
                     <MqDivDropdown
                       hideoutclick={1}
+                      disabled={this.checkNoSelectedProducts()}
                     >
                       <MqDivDropdownHead
                         button={1}
@@ -324,6 +373,11 @@ class Users extends Component {
                     }
                   </MqDivDropdownBody>
                 </MqDivDropdown>
+              </div>
+              <div className="col-md-2">
+                <button onClick={() => {
+                  this.changeShowModal()
+                }}>click</button>
               </div>
             </div>
           </div>
@@ -437,8 +491,56 @@ class Users extends Component {
                 })}
                 </tbody>
               </table>
+
             </div>
           </div>
+          <MqPagination className="table-pagination-right pagination align-self-end"
+                        from={1}
+                        to={15}
+                        choosePage={(page) => {
+                            this.choosePage(page)
+                        }}
+                        onPrev={() =>{
+                          this.setState((state) => {
+                            state.currentPage--
+                            return state
+                          })
+                        }}
+                        onNext={() =>{
+                          this.setState((state) => {
+                            state.currentPage++
+                            return state
+                          })
+                        }}
+                        currentPage={this.state.currentPage}
+
+          />
+          <Modal isOpen={this.state.showModelDelete}
+                 className={'modal-lg ' + this.props.className}>
+            <ModalHeader toggle={this.toggleLarge}>
+              <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
+            </ModalHeader>
+            <ModalBody>
+              <MqAlert className="alert alert-warning alert-dismissible alert-styled-left border-top-0 border-bottom-0 border-right-0">
+                <span className="font-weight-semibold">Lưu ý!</span> Sau khi xóa sản phẩm, mọi thông tin sẽ không thể phục hồi.
+              </MqAlert>
+              <p>Bạn đồng ý xóa sản phẩm này chứ?</p>
+              {this.state.deleteItemStatus === true ? (<p className="modal-clear-status"><SuccessIcon /></p>) : ''}
+              {this.state.deleteItemStatus === false ? [(
+                <p className="modal-clear-status"><ErrorIcon /></p>),
+                <MqAlert className="alert alert-warning alert-dismissible alert-styled-left border-top-0 border-bottom-0 border-right-0">
+                <span className="font-weight-semibold">Đã xảy ra lỗi!</span> Không thể thực hiện. Vui lòng thực hiện lại sau.
+              </MqAlert>]: ''}
+
+
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={() => {
+
+              }}>Do Something</Button>{' '}
+              <Button color="secondary" onClick={() => {this.cancelDeleteItem()}}>Cancel</Button>
+            </ModalFooter>
+          </Modal>
         </div>
       </main>
     )

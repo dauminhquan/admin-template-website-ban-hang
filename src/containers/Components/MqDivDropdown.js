@@ -1,4 +1,6 @@
 import React, {Component,} from "react";
+import MqSelect from "./MqSelect";
+import PropTypes from "prop-types";
 
 class MqDivDropdown extends Component{
   constructor(props){
@@ -38,13 +40,25 @@ class MqDivDropdown extends Component{
     const childrenWithProps = React.Children.map(this.props.children, child =>{
         if(child.type.name){
           if(child.type.name == 'MqDivDropdownHead'){
-            return React.cloneElement(child, { onClick: () => {
-                this.setState((state) => {
-                  state.menuOpen = !state.menuOpen
-                  return state
-                })
-              }}
-            )
+            if(!this.props.disabled)
+            {
+              return React.cloneElement(child, { onClick: () => {
+                  this.setState((state) => {
+                    state.menuOpen = !state.menuOpen
+                    return state
+                  })
+                }}
+              )
+            }else{
+              const { className } = child.props
+              let newClass = className.split(' ')
+              if(!newClass.includes('disabled')){
+                newClass.push('disabled')
+              }
+              newClass = newClass.join(' ')
+              return React.cloneElement(child, { className: newClass}
+              )
+            }
           }
           if(child.type.name == 'MqDivDropdownBody' || child.type.name  == 'MqDivDropdown'){
             let props = {}
@@ -77,6 +91,7 @@ class MqDivDropdown extends Component{
     )
   }
 }
-
-
+MqDivDropdown.propTypes = {
+  disabled: PropTypes.bool
+}
 export default MqDivDropdown
