@@ -5,6 +5,13 @@ class MqDivDropdownHead extends Component{
     super(props)
   }
   render() {
+    if(this.props.button){
+      return(
+        <button {...this.props}>
+          {this.props.children}
+        </button>
+      )
+    }
     return(
       <a href="javascript:void(0)" {...this.props}>
         {this.props.children}

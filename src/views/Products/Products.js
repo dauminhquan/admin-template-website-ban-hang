@@ -2,7 +2,14 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge, Card, CardBody, CardHeader, Col, Row, Table } from 'reactstrap';
 import ProductsHeader from "./ProductsHeader";
-
+import MqDivDropdown from "../../containers/Components/MqDivDropdown";
+import MqDivDropdownHead from "../../containers/Components/MqDivDropdownHead";
+import MqDivDropdownBody from "../../containers/Components/MqDivDropdownBody";
+import ReactSelect from 'react-select';
+import { colourOptions } from '../../../src/containers/Components/docs/data';
+import makeAnimated from 'react-select/animated';
+import MqSelect from "../../containers/Components/MqSelect";
+const animatedComponents = makeAnimated();
 const COLUMNS = [
   {
     name: 'is_active',
@@ -61,6 +68,7 @@ const COLUMNS = [
     text: 'Specifications'
   }
 ]
+
 // '_id','name','category','brand','supplier','created_at','updated_at','is_active',
 //   'cost_origin','price','sale','images','options','sku','specifications','is_parent'
 function makeid(length) {
@@ -85,8 +93,12 @@ class Users extends Component {
         type: ''
       },
       productsSelected: {},
+      showColumns: {
+
+      },
       selectedAll: false
     }
+    this.wrapperRef = React.createRef()
   }
   componentDidMount() {
     let products = this.createRandomProduct(10)
@@ -94,6 +106,9 @@ class Users extends Component {
       state.products = products
       products.forEach(product => {
         state.productsSelected[product._id] = false
+      })
+      COLUMNS.forEach(column => {
+        state.showColumns[column.name] = true
       })
       return state
     })
@@ -197,6 +212,13 @@ class Users extends Component {
     }
   }
 
+  changeShowColumn(column,checked){
+    this.setState(state => {
+      state.showColumns[column.name] = checked
+      return state
+    })
+  }
+
   changeSelectProduct(_id,checked){
     const rjs = this
     this.setState(state => {
@@ -222,12 +244,88 @@ class Users extends Component {
     return (
       <main>
         <ProductsHeader/>
+
         <div className="content">
           <div className="mb-3">
-            <h6 className="mb-0 font-weight-semibold">
-              Basic tables
-            </h6>
-            <span className="text-muted d-block">Tables with default <code>Bootstrap</code> styling</span>
+            <div className="row">
+              <div className="col-md-2">
+                <div className="form-group">
+                  <div className="btn-group">
+                    <MqDivDropdown
+                      hideoutclick={1}
+                    >
+                      <MqDivDropdownHead
+                        button={1}
+                        className="btn btn-light"
+                      >
+                        Selected 100 products
+                        <i className="icon-menu-open"></i>
+                      </MqDivDropdownHead>
+                      <MqDivDropdownBody className="dropdown-menu dropdown-menu-left">
+                        <a href="#" className="dropdown-item"><i className="icon-user-lock"></i> Account securitydsdsadsadsad sdadsa sda</a>
+                        <a href="#" className="dropdown-item"><i className="icon-statistics"></i> Analytics</a>
+                        <a href="#" className="dropdown-item"><i className="icon-accessibility"></i> Accessibility</a>
+                        <div className="dropdown-divider"></div>
+                        <a href="#" className="dropdown-item"><i className="icon-gear"></i> All settings</a>
+                      </MqDivDropdownBody>
+                    </MqDivDropdown>
+                  </div>
+                </div>
+              </div>
+              <div className="col-md-2">
+                <div className="form-group">
+                  <div className="input-group">
+                    <input type="text" className="form-control" placeholder="Search..." />
+											<span className="input-group-append">
+												<button className="btn btn-light" type="button"><i className="icon-search4"></i></button>
+											</span>
+                  </div>
+                </div>
+              </div>
+              <div className="col-md-2">
+                <div className="form-group">
+                  <div className="input-group">
+                    <input type="text" className="form-control" placeholder="Search..." />
+                    <span className="input-group-append">
+												<button className="btn btn-light" type="button"><i className="icon-search4"></i></button>
+											</span>
+                  </div>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <MqSelect multiple
+                          selectedItem={(item) => {
+                            console.log(item)
+                          }}
+                          removeItemSelected={(item) => {
+
+                          }}
+                />
+              </div>
+              <div className="col-md-2">
+                <MqDivDropdown hideoutclick={1} className="breadcrumb-elements-item dropdown p-0">
+                  <MqDivDropdownHead button className="btn btn-light dropdown-toggle">
+                    <i className="icon-gear mr-2"></i>
+                    Hiển thị
+                  </MqDivDropdownHead>
+
+                  <MqDivDropdownBody className="dropdown-menu dropdown-menu-left dropdown-checkbox-body">
+                    {
+                      COLUMNS.map(column => {
+                        let id = makeid(5)
+                          return(
+                            <div className="dropdown-item" key={id}><input type="checkbox" id={id+'show-column'+column.name} checked={this.state.showColumns[column.name]} onChange={(e) => {
+                              this.changeShowColumn(column,e.target.checked)
+                            }}/>
+                              <label className="dropdown-checkbox-label" htmlFor={id+'show-column'+column.name}> {column.text}</label>
+                            </div>
+                          )
+                      })
+                    }
+                  </MqDivDropdownBody>
+                </MqDivDropdown>
+              </div>
+            </div>
           </div>
 
           <div className="card">
@@ -261,9 +359,11 @@ class Users extends Component {
                     }
 
                   }} /></th>
-                  {COLUMNS.map(column => (
-                    <th key={column.name} className="columns-table" onClick={() => {this.sortAction(column.name)}}><span className="text-column">{column.text}</span> <span className={"table-sort-icon " + (this.state.sort.name == column.name? (this.state.sort.type == 'A-Z' ? "icon-sort-alpha-asc": 'icon-sort-alpha-desc') : "icon-sort") }></span></th>
-                  ))}
+                  {COLUMNS.map(column => {
+                    if(this.state.showColumns[column.name]){
+                      return (<th key={column.name} className="columns-table" onClick={() => {this.sortAction(column.name)}}><span className="text-column">{column.text}</span> <span className={"table-sort-icon " + (this.state.sort.name == column.name? (this.state.sort.type == 'A-Z' ? "icon-sort-alpha-asc": 'icon-sort-alpha-desc') : "icon-sort") }></span></th>)
+                    }
+                  })}
                 </tr>
                 </thead>
                 <tbody>
@@ -275,25 +375,27 @@ class Users extends Component {
                     }}/></td>
                     {
                       COLUMNS.map((column,cl_index) => {
-                        if(column.name == 'is_active'){
-                          if(item['is_parent'] && !item['parent_sku']){
-                            return (<td key={item._id+cl_index}>
-                              <span className="product-status" onClick={() => {this.showVariation(item.sku)}}><i className={this.state.showVariations[item.sku] ? "icon-arrow-down12" : "icon-arrow-right13"}></i> Variations</span>
-                            </td>)
-                          }else{
-                            if(item.is_active){
+                        if(this.state.showColumns[column.name]){
+                          if(column.name == 'is_active'){
+                            if(item['is_parent'] && !item['parent_sku']){
                               return (<td key={item._id+cl_index}>
-                                <span className="product-status"><i className="icon-check2"></i> Active</span>
+                                <span className="product-status" onClick={() => {this.showVariation(item.sku)}}><i className={this.state.showVariations[item.sku] ? "icon-arrow-down12" : "icon-arrow-right13"}></i> Variations</span>
                               </td>)
+                            }else{
+                              if(item.is_active){
+                                return (<td key={item._id+cl_index}>
+                                  <span className="product-status"><i className="icon-check2"></i> Active</span>
+                                </td>)
+                              }
                             }
+                            return (<td key={item._id+cl_index}>
+                              <span className="product-status"><i className="icon-close"></i> Inactive</span>
+                            </td>)
+                          }else if(column.name == 'image'){
+                            return <td key={'image'+item._id}><img src={item.image} alt=""/></td>
                           }
-                          return (<td key={item._id+cl_index}>
-                            <span className="product-status"><i className="icon-close"></i> Inactive</span>
-                          </td>)
-                        }else if(column.name == 'image'){
-                          return <td key={'image'+item._id}><img src={item.image} alt=""/></td>
+                          return (<td key={item._id+cl_index}>{item[column.name]}</td>)
                         }
-                        return (<td key={item._id+cl_index}>{item[column.name]}</td>)
                       })
                     }
                   </tr>)
@@ -303,21 +405,23 @@ class Users extends Component {
                     variations.forEach((variation,variation_index) => {
                       let contentVariation = []
                         COLUMNS.map((column_variation,cl_variation_index) => {
-                          if(column_variation.name == 'is_active'){
-                            if(item.is_active){
-                              contentVariation.push(<td key={variation._id+cl_variation_index}>
-                                <span className="product-status"><i className="icon-check2"></i> Active</span>
-                              </td>)
-                            }else{
-                              contentVariation.push(<td key={variation._id+cl_variation_index}>
-                                <span className="product-status"><i className="icon-close"></i> Inactive</span>
-                              </td>)
+                          if(this.state.showColumns[column_variation.name]){
+                            if(column_variation.name == 'is_active'){
+                              if(item.is_active){
+                                contentVariation.push(<td key={variation._id+cl_variation_index}>
+                                  <span className="product-status"><i className="icon-check2"></i> Active</span>
+                                </td>)
+                              }else{
+                                contentVariation.push(<td key={variation._id+cl_variation_index}>
+                                  <span className="product-status"><i className="icon-close"></i> Inactive</span>
+                                </td>)
+                              }
+                            }else if(column_variation.name == 'image'){
+                              contentVariation.push(<td key={'image'+variation._id}><img src={variation.image} alt=""/></td>)
                             }
-                          }else if(column_variation.name == 'image'){
-                            contentVariation.push(<td key={'image'+variation._id}><img src={variation.image} alt=""/></td>)
-                          }
-                          else{
-                            contentVariation.push(<td key={variation._id+cl_variation_index}>{variation[column_variation.name]}</td>)
+                            else{
+                              contentVariation.push(<td key={variation._id+cl_variation_index}>{variation[column_variation.name]}</td>)
+                            }
                           }
                         })
 

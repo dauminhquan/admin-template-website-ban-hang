@@ -61,7 +61,7 @@ class MqDivDropdown extends Component{
     )
 
 
-    let className = this.props.className.split(' ')
+    let className = this.props.className ? this.props.className.split(' '): []
     if(this.state.menuOpen == false){
       className = className.filter(item => {
         return item !='show'
