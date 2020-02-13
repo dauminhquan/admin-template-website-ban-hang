@@ -1,27 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from 'prop-types';
-const VALUES = [
-  {
-    key: 1,
-    text: "một"
-  },
-  {
-    key: 2,
-    text: "hai"
-  },
-  {
-    key: 3,
-    text: "ba"
-  },
-  {
-    key: 4,
-    text: "bốn"
-  },
-  {
-    key: 5,
-    text: "năm"
-  }
-]
+
 function makeid(length) {
   let result           = '';
   let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -31,7 +10,7 @@ function makeid(length) {
   }
   return result;
 }
-const PLACEHOLDER = "Lựa chọn một mục..."
+
 
 class MqSelect extends Component {
   constructor(props){
@@ -41,7 +20,7 @@ class MqSelect extends Component {
       className: this.props.className,
       show: false,
       itemSelected: [],
-      contentShow: VALUES,
+      contentShow: [],
       searchText: ''
     }
     this.wrapperRef = React.createRef()
@@ -51,6 +30,15 @@ class MqSelect extends Component {
     if(this.props.multiple && !this.props.removeItemSelected){
       console.error('removeItemSelected is required')
     }
+
+    if(this.state.contentShow.length == 0){
+      const {values} = this.props
+      this.setState(state => {
+        state.contentShow = values
+        return state
+      })
+    }
+
   }
 
   componentWillUnmount() {
@@ -70,9 +58,10 @@ class MqSelect extends Component {
     this.refs[this.wrapperRef+"search-input"].focus()
   }
   searchItem(text){
+    const {values} = this.props
     if(text.trim() !=''){
       let result = []
-      VALUES.forEach(value => {
+      this.props.values.forEach(value => {
         if(value.text.toUpperCase().includes(text.toUpperCase())){
           result.push(value)
         }
@@ -83,7 +72,7 @@ class MqSelect extends Component {
       })
     }else{
       this.setState(state => {
-        state.contentShow = VALUES
+        state.contentShow = values
         return state
       })
     }
@@ -96,17 +85,21 @@ class MqSelect extends Component {
   selectItem(item){
       if(this.props.multiple){
         const rjs = this
-        this.setState(state => {
-            if(rjs.checkSelectedItem(state.itemSelected,item)){
-              state.itemSelected = state.itemSelected.filter(i => {
-                return i.key != item.key
-              })
-            }else{
-              state.itemSelected.push(item)
-            }
+        if(this.checkSelectedItem(this.state.itemSelected,item)){
+          this.setState(state => {
+            state.itemSelected = state.itemSelected.filter(i => {
+              return i.key != item.key
+            })
             return state
-        })
-        this.props.selectedItem(item)
+          })
+          this.props.removeItemSelected(item)
+        }else{
+          this.setState(state => {
+            state.itemSelected.push(item)
+            return state
+          })
+          this.props.selectedItem(item)
+        }
       }else{
         this.setState(state =>{
           state.itemSelected = item
@@ -145,8 +138,14 @@ class MqSelect extends Component {
   }
   getContentResultShow(){
     let results = []
+    const {values} = this.props
     if(this.state.contentShow.length == 0){
-      results.push(<div key={this.wrapperRef.current+'none-result'} className={"dropdown-item-none"}> Không có kết quả phù hợp</div>)
+      if(values.length == 0){
+        results.push(<div key={this.wrapperRef.current+'none-result'} className={"dropdown-item-none"}> Không có mục nào để hiện thị</div>)
+      }else{
+        results.push(<div key={this.wrapperRef.current+'none-result'} className={"dropdown-item-none"}> Không có kết quả phù hợp</div>)
+      }
+
     }else{
       this.state.contentShow.map(item=> (
         results.push(<div key={this.wrapperRef.current+item.key} className={"dropdown-item " + (this.checkItemSelected(item) ? 'mq-item-selected' : '')} onClick={() => {this.selectItem(item)}}> {item.text}</div>)
@@ -161,29 +160,34 @@ class MqSelect extends Component {
       this.state.itemSelected.forEach(item =>{
         searchResult.push(
           <div className="mq-select-head-item" key={this.wrapperRef.current+"mq-select-head-item"+item.key}>{item.text} <i className="mi-close mq-select-head-item-icon" onClick={() => {
-            this.removeItemSelected(item)
+            if(!this.props.disabled){
+              this.removeItemSelected(item)
+            }
+
           }}></i></div>
         )
       })
 
       searchResult.push(
-        <div className="mq-select-head-item-input" key={makeid(5)}><input type="text" onFocus={() => {
+        <div className="mq-select-head-item-input" key={makeid(5)}><input type="text" readOnly={this.props.disabled ? "disabled": ""} className={this.props.disabled? "mq-select-disabled": ""} onFocus={() => {
+          if(!this.props.disabled){
             this.focusSearch(true)
-        }} placeholder={PLACEHOLDER}/></div>
+          }
+        }} placeholder={this.props.placeholder}/></div>
       )
     }else {
       if(this.state.itemSelected.text){
         searchResult.push(this.state.itemSelected.text)
       }else{
-        searchResult.push(<i className="mq-select-placeholder">{PLACEHOLDER}</i>)
+        searchResult.push(<i className="mq-select-placeholder">{this.props.placeholder}</i>)
       }
 
     }
 
     return (
       <div {...this.props} ref={this.wrapperRef} className="form-group form-group-feedback form-group-feedback-right">
-        <div className="form-control mq-select-head" onClick={() => {
-          if(!this.props.multiple){
+        <div className={"form-control mq-select-head "+ (this.props.disabled? "mq-select-disabled": "")} onClick={() => {
+          if(!this.props.multiple && !this.props.disabled){
             this.changeShowState()
           }
         }}>
@@ -216,6 +220,14 @@ class MqSelect extends Component {
 }
 MqSelect.propTypes = {
   selectedItem: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+  values: PropTypes.array,
+  removeItemSelected: PropTypes.func,
+  disabled: PropTypes.bool
 }
-
+MqSelect.defaultProps = {
+  placeholder: "Chọn một mục...",
+  values: [],
+  disabled: false
+}
 export default MqSelect

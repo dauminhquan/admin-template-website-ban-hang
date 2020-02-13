@@ -342,13 +342,14 @@ class Users extends Component {
                 </div>
               </div>
               <div className="col-md-4">
-                <MqSelect multiple
-                          selectedItem={(item) => {
-                            console.log(item)
-                          }}
-                          removeItemSelected={(item) => {
+                <MqSelect
+                  multiple
+                  selectedItem={(item) => {
+                    console.log(item)
+                  }}
+                  removeItemSelected={(item) => {
 
-                          }}
+                  }}
                 />
               </div>
               <div className="col-md-2">
