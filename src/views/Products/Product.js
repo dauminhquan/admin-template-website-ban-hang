@@ -20,6 +20,8 @@ const ATTRIBUTES = [
     text: "Cân nặng"
   }
 ]
+const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));
+const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);
 function makeid(length) {
   let result           = '';
   let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -34,7 +36,7 @@ class Product extends  Component{
     super(props)
     this.state = {
       tab: "variations",
-      attributes: [
+      attributes: [ //tam thoi chua dung den
 
       ],
       productAttributes: [
@@ -58,32 +60,71 @@ class Product extends  Component{
         //   ]
         // }
       ],
-      showModelResetVariations: false
+      showModelResetVariations: false,
+      variations: [
+        // {
+        //   price: 0,
+        //   option: {
+        //     attribute: 1,
+        //     value: 1
+        //   },
+        //   sku: 1,
+        //   quantity: 1
+        // }
+      ]
     }
   }
   resetVariations(){
     this.setState(state => {
       state.showModelResetVariations = false
-
+      state.variations = []
       state.parentOptions = state.parentOptions.map(item => {
-        item.values = {
+        item.values = [{
           key: makeid(10),
           text: ''
-        }
+        }]
+        return item
+      })
+      return state
+    })
+  }
+  addVariations(){
+
+    let variations = []
+    this.state.parentOptions.forEach(parentOption => {
+
+      if(this.state.productAttributes.find(attribute => {
+        return attribute.key == parentOption.attribute.key
+      })){
+        let temp = []
+        parentOption.values.forEach(item => {
+          if(item.text != ""){
+            temp.push({
+              attribute:parentOption.attribute,
+              value: item
+            })
+          }
+
+        })
+        variations.push(temp)
+      }
+    })
+    variations = cartesian(...variations)
+
+    this.setState(state => {
+      state.variations = state.variations.concat(variations)
+      state.parentOptions = state.parentOptions.map(item => {
+        item.values = [{
+          key: makeid(10),
+          text: ''
+        }]
         return item
       })
       return state
     })
   }
   checkSetParentOptions(){
-    for(let i = 0 ; i< this.state.parentOptions.length; i++){
-      for(let j = 0; j< this.state.parentOptions[i].values.length;j++){
-        if(this.state.parentOptions[i].values[j].text != ""){
-          return true
-        }
-      }
-    }
-    return false
+    return this.state.variations.length > 0
   }
   setTab(tab){
     this.setState({
@@ -120,7 +161,58 @@ class Product extends  Component{
       return state
     })
   }
+  getTableVariations(){
+    const {variations,productAttributes} = this.state
+    if(this.checkSetParentOptions()){
+      return (
+        <div className="card">
+          <div className="card-header header-elements-inline">
+            <h5 className="card-title">Variations</h5>
+          </div>
 
+          <div className="card-body">
+            Example of a <code>basic</code> table. For basic styling (light padding and only horizontal dividers) add
+            the base class <code>.table</code> to any <code>&lt;table&gt;</code>. It may seem super redundant, but
+            given the widespread use of tables for other plugins like calendars and date pickers, we've opted to
+            isolate our custom table styles.
+          </div>
+
+          <div className="table-responsive">
+            <table className="table">
+              <thead>
+              <tr>
+                {this.state.productAttributes.map(productAttribute => (
+                  <th key={productAttribute.key}>{productAttribute.text}</th>
+                ))}
+                <th>Variation SKU</th>
+                <th>Price</th>
+                <th>Quantity</th>
+              </tr>
+              </thead>
+              <tbody>
+              {
+                variations.map(variationAttrs => {
+                  let trContent = []
+                  for(let i = 0 ; i < productAttributes.length ; i++){
+                    let variationAttr = variationAttrs.find(item => {
+                      return item.attribute.key == productAttributes[i].key
+                    })
+                    trContent.push(<td key={variationAttr.value.key}>{variationAttr.value.text}</td>)
+                  }
+                  trContent.push(<td key={makeid(10)}><input type="text" className="form-control"/></td>)
+                  trContent.push(<td key={makeid(10)}><input type="text" className="form-control"/></td>)
+                  trContent.push(<td key={makeid(10)}><input type="text" className="form-control"/></td>)
+                  return (<tr>{trContent}</tr>)
+                })
+              }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )
+    }
+    return ""
+  }
   changeParentOptionValueText(attribute,valueKey,text){
     this.setState(state => {
       state.parentOptions = state.parentOptions.map(parentOption => {
@@ -165,6 +257,7 @@ class Product extends  Component{
       return state
     })
   }
+
   getContentProductAttributes(){
     return (
       this.state.productAttributes.length > 0 ?
@@ -189,7 +282,7 @@ class Product extends  Component{
             }
             <div className="form-group row">
               <div className="offset-lg-2 col-lg-3">
-                <button type="button" className="btn btn-primary">Thêm biến thể <i className="icon-paperplane ml-2"></i></button>
+                <button type="button" className="btn btn-primary" onClick={() => {this.addVariations()}}>Thêm biến thể <i className="icon-paperplane ml-2"></i></button>
               </div>
             </div>
 
@@ -209,6 +302,7 @@ class Product extends  Component{
         results.push(
           <div className="col-lg-1" key={index}>
             <input type="text" className="form-control" value={value.text} onChange={(e) => {
+
                 this.changeParentOptionValueText(attribute,value.key,e.target.value)
             }}/>
           </div>
@@ -216,6 +310,7 @@ class Product extends  Component{
       })
       return results
     }
+    console.log('out')
     return (
       <div className="col-lg-1">
         <input type="text" className="form-control"/>
@@ -223,6 +318,7 @@ class Product extends  Component{
     )
   }
   render() {
+    const {variations,productAttributes} = this.state
     return(
       <main>
         <ProductHeader/>
@@ -357,6 +453,9 @@ class Product extends  Component{
               </div>
             </div>
           </div>
+          {
+            this.getTableVariations()
+          }
           <Modal isOpen={this.state.showModelResetVariations} className={'modal-lg'}>
             <ModalHeader toggle={this.toggleLarge}>
               <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
