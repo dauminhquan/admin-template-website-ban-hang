@@ -344,10 +344,7 @@ class Users extends Component {
               <div className="col-md-4">
                 <MqSelect
                   multiple
-                  selectedItem={(item) => {
-                    console.log(item)
-                  }}
-                  removeItemSelected={(item) => {
+                  onChange={(values,item,type) => {
 
                   }}
                 />
@@ -379,6 +376,9 @@ class Users extends Component {
                 <button onClick={() => {
                   this.changeShowModal()
                 }}>click</button>
+              </div>
+              <div className="col-md-2">
+                <Link to={"/products/1"}>Xem trang thông tin chi tiết sản phẩm</Link>
               </div>
             </div>
           </div>

@@ -32,9 +32,10 @@ class MqSelect extends Component {
     }
 
     if(this.state.contentShow.length == 0){
-      const {values} = this.props
+      const {values,defaultItemSelected} = this.props
       this.setState(state => {
         state.contentShow = values
+        state.itemSelected = defaultItemSelected
         return state
       })
     }
@@ -43,6 +44,32 @@ class MqSelect extends Component {
 
   componentWillUnmount() {
     document.removeEventListener('click', this.handleClick)
+  }
+  componentWillReceiveProps(nextProps){
+
+    // console.log("sosanh - truoc",this.props.itemSelected,"moi: ",nextProps.itemSelected)
+    // console.log("ok"+this.changedValueSelected(nextProps.itemSelected,this.props.itemSelected))
+    // const {itemSelected} = this.state
+    // if(this.changedValueSelected(nextProps.itemSelected,this.props.itemSelected)){
+    //   this.setState(state => {
+    //     state.itemSelected = nextProps.itemSelected
+    //     console.log("state change ",state.itemSelected)
+    //     return state
+    //   })
+    // }
+  }
+  changedValueSelected(propSelected,selected){
+    if(propSelected.length != selected.length){
+      return true
+    }
+    for(let i = 0 ; i < propSelected.length ; i++){
+      if(!selected.find(item => {
+        return item.key == propSelected[i].key
+      })){
+        return true
+      }
+    }
+    return false
   }
   handleClick = (event) => {
     const { target } = event
@@ -86,19 +113,29 @@ class MqSelect extends Component {
       if(this.props.multiple){
         const rjs = this
         if(this.checkSelectedItem(this.state.itemSelected,item)){
+          let changeSelected = this.state.itemSelected.filter(i => {
+            return i.key != item.key
+          })
           this.setState(state => {
-            state.itemSelected = state.itemSelected.filter(i => {
-              return i.key != item.key
-            })
+            state.itemSelected = changeSelected
             return state
           })
-          this.props.removeItemSelected(item)
+          if(this.props.removeItemSelected){
+            this.props.removeItemSelected(item)
+          }
+          this.props.onChange(changeSelected,item,-1)
         }else{
+          let changeSelected = this.state.itemSelected
+          changeSelected.push(item)
           this.setState(state => {
-            state.itemSelected.push(item)
+            state.itemSelected = changeSelected
             return state
           })
-          this.props.selectedItem(item)
+          if(this.props.selectedItem){
+            this.props.selectedItem(item)
+          }
+          this.props.onChange(changeSelected,item,1)
+
         }
       }else{
         this.setState(state =>{
@@ -106,21 +143,25 @@ class MqSelect extends Component {
           state.show = false
           return state
         })
-        this.props.selectedItem(item)
+        if(this.props.selectedItem){
+          this.props.selectedItem(item)
+        }
+        this.props.onChange([item],item,1)
+
       }
   }
   removeItemSelected(item){
-    if(!this.props.removeItemSelected){
-      console.error("removeItemSelected is required");
-    }else{
-      this.setState(state => {
-        state.itemSelected = state.itemSelected.filter(i => {
-          return i.key != item.key
-        })
-        return state
-      })
+    let changeSelected = this.state.itemSelected.filter(i => {
+      return i.key != item.key
+    })
+    this.setState(state => {
+      state.itemSelected = changeSelected
+      return state
+    })
+    if(this.props.removeItemSelected){
       this.props.removeItemSelected(item)
     }
+    this.props.onChange(changeSelected,item,-1)
   }
   checkItemSelected(item){
     if(this.props.multiple){
@@ -159,7 +200,7 @@ class MqSelect extends Component {
     {
       this.state.itemSelected.forEach(item =>{
         searchResult.push(
-          <div className="mq-select-head-item" key={this.wrapperRef.current+"mq-select-head-item"+item.key}>{item.text} <i className="mi-close mq-select-head-item-icon" onClick={() => {
+          <div className="mq-select-head-item" key={makeid(10)+"mq-select-head-item"+item.key}>{item.text} <i className="mi-close mq-select-head-item-icon" onClick={() => {
             if(!this.props.disabled){
               this.removeItemSelected(item)
             }
@@ -223,11 +264,15 @@ MqSelect.propTypes = {
   placeholder: PropTypes.string,
   values: PropTypes.array,
   removeItemSelected: PropTypes.func,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  defaultItemSelected: PropTypes.array,
+  onChange: PropTypes.func.isRequired
 }
 MqSelect.defaultProps = {
   placeholder: "Chọn một mục...",
   values: [],
-  disabled: false
+  disabled: false,
+  defaultItemSelected: [],
+
 }
 export default MqSelect

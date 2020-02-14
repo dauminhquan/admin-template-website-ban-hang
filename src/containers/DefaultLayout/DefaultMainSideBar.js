@@ -70,69 +70,44 @@ class  DefaultMainSideBar extends Component{
               </MqNavItem>
               <MqNavItem className="nav-item">
                 <MqNavItemHead to="/products" className="nav-link">
-                  <i className="icon-table2"></i>
+                  <i className="icon-menu4"></i>
                   <span>
-								  Datatable
+								  Quản lý sản phẩm
 								</span>
                 </MqNavItemHead>
               </MqNavItem>
               <MqNavItem className="nav-item nav-item-submenu">
                 <MqNavItemHead className="nav-link">
-                  <i className="icon-copy"></i> <span>Xin chao</span>
+                  <i className="icon-cog2"></i> <span>Cấu hình sản phẩm</span>
                 </MqNavItemHead>
                 <MqNav className="nav nav-group-sub">
                   <MqNavItem className="nav-item">
-                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">No sidebar</MqNavItemHead>
+                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý danh mục sản phẩm</MqNavItemHead>
                   </MqNavItem>
                   <MqNavItem className="nav-item">
-                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">No sidebar</MqNavItemHead>
+                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý nhà cung cấp</MqNavItemHead>
                   </MqNavItem>
                   <MqNavItem className="nav-item">
-                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">No sidebar</MqNavItemHead>
+                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý danh sách thuộc tính</MqNavItemHead>
                   </MqNavItem>
                   <MqNavItem className="nav-item">
-                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">No sidebar</MqNavItemHead>
-                  </MqNavItem>
-                  <MqNavItem className="nav-item nav-item-submenu">
-                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">No sidebar</MqNavItemHead>
-                    <MqNav className="nav nav-group-sub">
-                      <MqNavItem className="nav-item">
-                        <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">No sidebar</MqNavItemHead>
-                      </MqNavItem>
-                      <MqNavItem className="nav-item">
-                        <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">No sidebar</MqNavItemHead>
-                      </MqNavItem>
-                      <MqNavItem className="nav-item">
-                        <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">No sidebar</MqNavItemHead>
-                      </MqNavItem>
-                      <MqNavItem className="nav-item">
-                        <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">No sidebar</MqNavItemHead>
-                      </MqNavItem>
-                      <MqNavItem className="nav-item">
-                        <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">No sidebar</MqNavItemHead>
-                      </MqNavItem>
-                    </MqNav>
+                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý thương hiệu</MqNavItemHead>
                   </MqNavItem>
                 </MqNav>
               </MqNavItem>
-              <li className="nav-item nav-item-submenu">
-                <a href="#" className="nav-link"><i className="icon-copy"></i> <span>Layouts</span></a>
-
-                <ul className="nav nav-group-sub" data-submenu-title="Layouts">
-                  <li className="nav-item"><a href="index.html" className="nav-link active">Default layout</a></li>
-                  <li className="nav-item"><a href="../../../../layout_2/LTR/default/full/index.html"
-                                              className="nav-link">Layout 2</a></li>
-                  <li className="nav-item"><a href="../../../../layout_3/LTR/default/full/index.html"
-                                              className="nav-link">Layout 3</a></li>
-                  <li className="nav-item"><a href="../../../../layout_4/LTR/default/full/index.html"
-                                              className="nav-link">Layout 4</a></li>
-                  <li className="nav-item"><a href="../../../../layout_5/LTR/default/full/index.html"
-                                              className="nav-link">Layout 5</a></li>
-                  <li className="nav-item"><a href="../../../../layout_6/LTR/default/full/index.html"
-                                              className="nav-link disabled">Layout 6 <span
-                    className="badge bg-transparent align-self-center ml-auto">Coming soon</span></a></li>
-                </ul>
-              </li>
+              <MqNavItem className="nav-item nav-item-submenu">
+                <MqNavItemHead className="nav-link">
+                  <i className="icon-gift"></i> <span>Giảm giá</span>
+                </MqNavItemHead>
+                <MqNav className="nav nav-group-sub">
+                  <MqNavItem className="nav-item">
+                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý chiến dịch</MqNavItemHead>
+                  </MqNavItem>
+                  <MqNavItem className="nav-item">
+                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý mã giảm giá</MqNavItemHead>
+                  </MqNavItem>
+                </MqNav>
+              </MqNavItem>
               <li className="nav-item nav-item-submenu">
                 <a href="#" className="nav-link"><i className="icon-color-sampler"></i> <span>Themes</span></a>
 

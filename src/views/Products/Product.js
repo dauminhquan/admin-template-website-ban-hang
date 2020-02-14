@@ -6,6 +6,9 @@ import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
 import MqAlert from "../../containers/Components/MqAlert";
 import SuccessIcon from "../../containers/Components/SuccessIcon";
 import ErrorIcon from "../../containers/Components/ErrorIcon";
+import MqLoading from "../../containers/Components/MqLoading";
+const SELECT_ITEM = 1
+const REMOVE_ITEM = -1
 const ATTRIBUTES = [
   {
     key: 1,
@@ -35,7 +38,7 @@ class Product extends  Component{
   constructor(props){
     super(props)
     this.state = {
-      tab: "variations",
+      tab: "vital-info",
       attributes: [ //tam thoi chua dung den
 
       ],
@@ -61,6 +64,7 @@ class Product extends  Component{
         // }
       ],
       showModelResetVariations: false,
+      showModelChangeIsParentResetVariations: false,
       variations: [
         // {
         //   price: 0,
@@ -71,9 +75,35 @@ class Product extends  Component{
         //   sku: 1,
         //   quantity: 1
         // }
+      ],
+      isParent: false,
+      productOptions: [
+        // {
+        //   attribute: {
+        //
+        //   },
+        //   value: ''
+        // }
+      ],
+      productImages: [
+
       ]
     }
   }
+  componentDidMount() {
+    this.setState(state => {
+      for(let i= 0 ; i < 10; i++){
+        state.productImages.push({
+          ref: "product-image+"+(i+1),
+          image: '',
+          base64: '',
+          loading: false
+        })
+      }
+      return state
+    })
+  }
+
   resetVariations(){
     this.setState(state => {
       state.showModelResetVariations = false
@@ -85,6 +115,16 @@ class Product extends  Component{
         }]
         return item
       })
+      return state
+    })
+  }
+  changeIsParentResetVariation(){
+    this.setState(state => {
+      state.showModelChangeIsParentResetVariations = false
+      state.variations = []
+      state.productAttributes = []
+      state.parentOptions = []
+      state.isParent = false
       return state
     })
   }
@@ -132,7 +172,9 @@ class Product extends  Component{
     })
   }
   selectProductAttribute(attribute){
-    if(!this.state.productAttributes.find(i => {
+    console.log(attribute,this.state.productAttributes)
+    const {productAttributes} = this.state
+    if(!productAttributes.find(i => {
       return i.key == attribute.key
     })){
       // nếu không tồn tại
@@ -149,17 +191,50 @@ class Product extends  Component{
             }]
           })
         }
+        if(state.isParent){
+            state.productOptions = []
+        }else{
+          state.productOptions = state.productAttributes.map(productAttribute =>{
+              return {
+                attribute: productAttribute,
+                value: ""
+              }
+          })
+        }
+        console.log('sau khi chon',state.productAttributes)
         return state
       })
     }
   }
   removeProductAttribute(attribute){
     this.setState(state => {
+      console.log("truoc",attribute,state.productAttributes)
       state.productAttributes = state.productAttributes.filter(item => {
         return item.key != attribute.key
       })
+      console.log("sau",attribute,state.productAttributes)
       return state
     })
+  }
+  getContentProductOptions(attribute,attributeIndex){
+    const {productOptions,isParent} = this.state
+    if(!isParent){
+      let productOption = productOptions.find(item => {
+        return item.attribute.key == attribute.key
+      })
+      console.log(productOptions,productOption)
+      return (
+        <div className="form-group row" key={attributeIndex+productOption.attribute.text}>
+          <label className="col-form-label col-lg-2">{productOption.attribute.text}</label>
+          <div className="col-lg-4">
+            <input type="text" className="form-control" value={productOption.value} onChange={(e) => {
+              this.changeProductOptionValueText(attribute,e.target.value)
+            }}/>
+          </div>
+        </div>
+      )
+    }
+    return ""
   }
   getTableVariations(){
     const {variations,productAttributes} = this.state
@@ -180,7 +255,9 @@ class Product extends  Component{
           <div className="table-responsive">
             <table className="table">
               <thead>
+
               <tr>
+                <th><input type="checkbox"/></th>
                 {this.state.productAttributes.map(productAttribute => (
                   <th key={productAttribute.key}>{productAttribute.text}</th>
                 ))}
@@ -191,8 +268,9 @@ class Product extends  Component{
               </thead>
               <tbody>
               {
-                variations.map(variationAttrs => {
+                variations.map((variationAttrs,index) => {
                   let trContent = []
+                  trContent.push(<td key={makeid(10)}><input type="checkbox"/></td>)
                   for(let i = 0 ; i < productAttributes.length ; i++){
                     let variationAttr = variationAttrs.find(item => {
                       return item.attribute.key == productAttributes[i].key
@@ -202,7 +280,7 @@ class Product extends  Component{
                   trContent.push(<td key={makeid(10)}><input type="text" className="form-control"/></td>)
                   trContent.push(<td key={makeid(10)}><input type="text" className="form-control"/></td>)
                   trContent.push(<td key={makeid(10)}><input type="text" className="form-control"/></td>)
-                  return (<tr>{trContent}</tr>)
+                  return (<tr key={index}>{trContent}</tr>)
                 })
               }
               </tbody>
@@ -257,10 +335,20 @@ class Product extends  Component{
       return state
     })
   }
-
-  getContentProductAttributes(){
+  changeProductOptionValueText(attribute,text){
+    this.setState(state => {
+      state.productOptions = state.productOptions.map(item => {
+        if(item.attribute.key == attribute.key){
+          item.value = text
+        }
+        return item
+      })
+      return state
+    })
+  }
+  getContentProductParentAttributes(){
     return (
-      this.state.productAttributes.length > 0 ?
+      this.state.productAttributes.length > 0 && this.state.isParent ?
         (
           <fieldset className="mb-3">
             <legend className="text-uppercase font-size-sm font-weight-bold">Variations</legend>
@@ -275,7 +363,7 @@ class Product extends  Component{
                 <div className="form-group row" key={index}>
                   <label className="col-form-label col-lg-2">{productAttribute.text}</label>
                   {
-                    this.getParentOptions(productAttribute)
+                    this.getContentParentOptions(productAttribute)
                   }
                 </div>
               ))
@@ -290,8 +378,7 @@ class Product extends  Component{
         ) : ""
     )
   }
-  getParentOptions(attribute){
-
+  getContentParentOptions(attribute){
     let parentOption = this.state.parentOptions.find(i => {
       return i.attribute.key == attribute.key
     })
@@ -302,7 +389,6 @@ class Product extends  Component{
         results.push(
           <div className="col-lg-1" key={index}>
             <input type="text" className="form-control" value={value.text} onChange={(e) => {
-
                 this.changeParentOptionValueText(attribute,value.key,e.target.value)
             }}/>
           </div>
@@ -310,15 +396,129 @@ class Product extends  Component{
       })
       return results
     }
-    console.log('out')
     return (
       <div className="col-lg-1">
         <input type="text" className="form-control"/>
       </div>
     )
   }
+  getContentProductSingle(){
+    if(!this.state.isParent){
+      return (
+        <fieldset className="mb-3">
+          <p className="mb-4">Nếu sản phẩm này là sản phẩm cha, vui lòng bỏ qua mục này.</p>
+          <legend className="text-uppercase font-size-sm font-weight-bold">Các thuộc tính</legend>
+          <div className="form-group row">
+            <label className="col-form-label col-lg-2">Các thuộc tính</label>
+            <div className="col-lg-10">
+              <MqSelect
+                multiple
+                values={ATTRIBUTES}
+                itemSelected={this.state.selectProductAttribute}
+                onChange={(values,item,type)=>{
+
+                  if(type == SELECT_ITEM){
+                    this.selectProductAttribute(item)
+                  }else{
+                    this.removeProductAttribute(item)
+                  }
+                }}
+                placeholder="Chọn các thuộc tính cho sản phẩm"
+              />
+            </div>
+          </div>
+          {
+            this.state.productAttributes.map((productAttribute,index) => (
+              this.getContentProductOptions(productAttribute,index)
+            ))
+          }
+          <div className="text-right">
+            <button type="button" className="btn btn-primary">Next <i className="icon-next ml-2"></i></button>
+          </div>
+        </fieldset>
+      )
+    }
+    return ""
+  }
+  setProductImage(file,ref){
+    this.setState(state => {
+      state.productImages = state.productImages.map(img => {
+        if(img.ref == ref){
+          img.image = file
+          img.loading = true
+        }
+        return img
+      })
+      return state
+    })
+    this.getBase64Image(file,ref)
+  }
+  getBase64Image(file,ref){
+    const rjs = this
+    this.getBase64(file, (result) => {
+      rjs.setState(state => {
+        state.productImages = state.productImages.map(img => {
+          if(img.ref == ref){
+            img.base64 = result
+            img.loading = false
+          }
+          return img
+        })
+        return state
+      })
+    })
+  }
+  getBase64(file, cb) {
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      cb(reader.result)
+    };
+    reader.onerror = function (error) {
+      console.log('Error: ', error);
+    };
+  }
+  getContentImage(image){
+    let i = this.state.productImages.find(img => {
+      return img.ref == image.ref
+    })
+    if(i.image){
+      return (
+        <div className="card-body-image">
+          {i.loading? (<MqLoading/>) :
+            (<img src={i.base64} alt="" />)
+          }
+        </div>
+      )
+    }
+    else{
+      return (
+        <div className="card-body-image">
+          <span className="card-body-image-upload" onClick={() => {this.refs[image.ref].click()}}>
+            <i className="fa fa-image"></i>
+            Tải lên hình ảnh
+          </span>
+          <input type="file" ref={image.ref} onChange={(e) => {
+            let file = e.target.files[0]
+            this.setProductImage(file,image.ref)
+          }} hidden/>
+        </div>
+      )
+    }
+  }
+  removeProductImage(ref){
+    this.setState(state => {
+      state.productImages = state.productImages.map(img => {
+        if(img.ref == ref){
+          img.image = null
+          img.base64 = null
+        }
+        return img
+      })
+      return state
+    })
+  }
   render() {
-    const {variations,productAttributes} = this.state
     return(
       <main>
         <ProductHeader/>
@@ -326,21 +526,18 @@ class Product extends  Component{
           <div className="card">
             <div className="card-header header-elements-inline">
               <h6 className="card-title">Basic tabs</h6>
-              <div className="header-elements">
-                <div className="list-icons">
-                  <a className="list-icons-item" data-action="collapse"></a>
-                  <a className="list-icons-item" data-action="reload"></a>
-                  <a className="list-icons-item" data-action="remove"></a>
-                </div>
-              </div>
             </div>
 
             <div className="card-body">
               <ul className="nav nav-tabs justify-content-center nav-tabs-highlight">
                 <li className="nav-item tab-head-item"><span className={"nav-link "+ (this.state.tab == 'vital-info' ? "active" : "")} onClick={() => {this.setTab('vital-info')}} data-toggle="tab">Vital Info</span></li>
-                <li className="nav-item tab-head-item"><span className={"nav-link "+ (this.state.tab == 'variations' ? "active" : "")} onClick={() => {this.setTab('variations')}} data-toggle="tab">Variations</span></li>
-                <li className="nav-item tab-head-item"><span className={"nav-link "+ (this.state.tab == 'offer' ? "active" : "")} onClick={() => {this.setTab('variations')}} data-toggle="tab">Offer</span></li>
-                <li className="nav-item tab-head-item"><span className={"nav-link "+ (this.state.tab == 'images' ? "active" : "")} onClick={() => {this.setTab('variations')}} data-toggle="tab">Images</span></li>
+                <li className={"nav-item tab-head-item " + (this.state.isParent ? "" :"table-disabled")}><span className={"nav-link "+ (this.state.tab == 'variations' ? "active" : "")} onClick={() => {
+                  if(this.state.isParent){
+                    this.setTab('variations')
+                  }
+                }} data-toggle="tab">Variations</span></li>
+                <li className="nav-item tab-head-item"><span className={"nav-link "+ (this.state.tab == 'offer' ? "active" : "")} onClick={() => {this.setTab('offer')}} data-toggle="tab">Offer</span></li>
+                <li className="nav-item tab-head-item"><span className={"nav-link "+ (this.state.tab == 'images' ? "active" : "")} onClick={() => {this.setTab('images')}} data-toggle="tab">Images</span></li>
               </ul>
               <div className="form-group float-right">
                 <BootstrapSwitchButton
@@ -359,13 +556,13 @@ class Product extends  Component{
                   <form action="#">
                     <fieldset className="mb-3">
                       <div className="form-group row">
-                        <label className="col-form-label col-lg-2">Tên sản phẩm</label>
+                        <label className="col-form-label col-lg-2">Tên sản phẩm*</label>
                         <div className="col-lg-10">
                           <input type="text" className="form-control"/>
                         </div>
                       </div>
                       <div className="form-group row">
-                        <label className="col-form-label col-lg-2">SKU sản phẩm</label>
+                        <label className="col-form-label col-lg-2">SKU sản phẩm*</label>
                         <div className="col-lg-10">
                           <input type="text" className="form-control"/>
                         </div>
@@ -376,79 +573,168 @@ class Product extends  Component{
                           <MqSelect
                             multiple
                             values={ATTRIBUTES}
-                            selectedItem={(item) => {
-                              console.log(item)
-                            }}
-                            removeItemSelected={(item) => {
-
-                            }}
+                            onChange={() =>{
+                            }
+                            }
                             placeholder="Chọn một thương hiệu"
                           />
                         </div>
                       </div>
                       <div className="form-group row">
-                        <label className="col-form-label col-lg-2">Thương hiệu</label>
+                        <label className="col-form-label col-lg-2">Nhà sản xuất</label>
                         <div className="col-lg-10">
                           <MqSelect
                             multiple
-                            selectedItem={(item) => {
-                              console.log(item)
-                            }}
-                            removeItemSelected={(item) => {
-
-                            }}
+                            onChange={() =>{
+                            }
+                            }
                             placeholder="Chọn một nhà sản xuất"
                           />
                         </div>
                       </div>
+                      <div className="form-group row">
+                        <label className="col-form-label col-lg-2">Là sản phẩm cha</label>
+                        <div className="col-lg-10">
+                          <input type="checkbox" checked={this.state.isParent} onChange={(e) => {
+                           const {variations} = this.state
+                            let checked = e.target.checked
+                            if(checked == false && variations.length > 0){
+                              this.setState({
+                                showModelChangeIsParentResetVariations:true
+                              })
+                            }
+                            else{
+                              this.setState(state => {
+                                state.isParent = checked
+                                state.productAttributes = []
+                                state.productOptions = []
+                                state.variations = []
+                                state.parentOptions = []
+                                return state
+                              })
+                            }
+                          }}/>
+                        </div>
+                      </div>
+                      {
+                        this.getContentProductSingle()
+                      }
                     </fieldset>
                   </form>
                 </div>
                 <div className={"tab-pane fade" + (this.state.tab == 'variations' ? " active show" : "")} ref="variations">
-                  <form action="#">
-                    <fieldset className="mb-3">
-                      <div className="form-group row">
-                        <label className="col-form-label col-lg-2">Loại biến thể</label>
-                        <div className="col-lg-9">
-                          <MqSelect
-                            disabled={this.checkSetParentOptions()}
-                            multiple
-                            values={ATTRIBUTES}
-                            selectedItem={(item) => {
-                              this.selectProductAttribute(item)
-                            }}
-                            removeItemSelected={(item) => {
-                              console.log(item)
-                              this.removeProductAttribute(item)
-                            }}
-                            placeholder="Cài đặt biến thể"
-                          />
-                        </div>
+                  {
+                    this.state.isParent ? (
+                      <form action="#">
+                        <fieldset className="mb-3">
+                          <div className="form-group row">
+                            <label className="col-form-label col-lg-2">Loại biến thể</label>
+                            <div className="col-lg-9">
+                              <MqSelect
+                                disabled={this.checkSetParentOptions()}
+                                multiple
+                                defaultItemSelected={this.state.productAttributes}
+                                values={ATTRIBUTES}
+                                onChange={(values,item,type)=>{
+                                  if(type == SELECT_ITEM){
+                                    this.selectProductAttribute(item)
+                                  }else{
+                                    this.removeProductAttribute(item)
+                                  }
+                                }}
+                                placeholder="Cài đặt biến thể"
+                              />
+                            </div>
+                            {
+                              this.checkSetParentOptions()? (<div className="col-lg-1">
+                                <button type="button" onClick={() => {
+                                  this.setState({
+                                    showModelResetVariations: true
+                                  })
+                                }} className="btn btn-primary">Sửa</button>
+                              </div>) : ""
+                            }
+
+                          </div>
+
+                        </fieldset>
                         {
-                          this.checkSetParentOptions()? (<div className="col-lg-1">
-                            <button type="button" onClick={() => {
-                              this.setState({
-                                showModelResetVariations: true
-                              })
-                            }} className="btn btn-primary">Sửa</button>
-                          </div>) : ""
+                          this.getContentProductParentAttributes()
                         }
+                        <div className="text-right">
+                          <button type="button" className="btn btn-primary">Next <i className="icon-next ml-2"></i></button>
+                        </div>
+                      </form>
+                    ) : ""
+                  }
+                </div>
 
+                <div className={"tab-pane fade" + (this.state.tab == 'offer' ? " active show" : "")} ref="offer">
+                  <fieldset className="mb-3">
+                    <div className="form-group row">
+                      <label className="col-form-label col-lg-2">Giá của sản phẩm</label>
+                      <div className="col-lg-10">
+                        <input type="text" className="form-control"/>
                       </div>
-                    </fieldset>
+                    </div>
+                    <div className="form-group row">
+                      <label className="col-form-label col-lg-2">Số lượng</label>
+                      <div className="col-lg-10">
+                        <input type="text" className="form-control"/>
+                      </div>
+                    </div>
+                    <div className="form-group row">
+                      <label className="col-form-label col-lg-2">Giảm giá</label>
+                      <div className="col-lg-10">
+                        <MqSelect
+                          values={ATTRIBUTES}
+                          onChange={() =>{
+                          }
+                          }
+                          placeholder="Chọn một mục giảm giá"
+                        />
+                      </div>
+                    </div>
                     {
-                      this.getContentProductAttributes()
+                      this.state.productAttributes.map((productAttribute) => (
+                        this.getContentProductOptions(productAttribute)
+                      ))
                     }
-
-                  </form>
+                  </fieldset>
                 </div>
 
-                <div className="tab-pane fade" ref="offer">
-                  DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg whatever.
-                </div>
+                <div className={"tab-pane fade" + (this.state.tab == 'images' ? " active show" : "")} ref="images">
+                  <div className="row">
+                    {
+                      this.state.productImages.map(image => (
+                        <div className="col-xl-3 col-sm-6" key={image.ref}>
+                          <div className="card">
+                            <div className="card-body text-center">
+                              {
+                                this.getContentImage(image)
+                              }
 
-                <div className="tab-pane fade" ref="images">
-                  Aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthet.
+                              <div className="mb-3">
+                                <div className="list-icons list-icons-extended font-weight-semibold mt-3 text-lg-center">
+                                  {
+                                    image.base64 ? (
+                                      <span className="list-icons-item image-bottom-icon-remove" onClick={() => {
+                                        this.removeProductImage(image.ref)
+                                      }} data-popup="tooltip" title="" data-container="body"
+                                            data-original-title="Remove Image"><i className="fa fa-trash"></i> Remove</span>
+                                    ): (
+                                      <span className="list-icons-item form-text text-warning">* Hình ảnh nên có kích thước 1000x1000 trở lên</span>
+                                    )
+                                  }
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
                 </div>
               </div>
             </div>
@@ -468,6 +754,22 @@ class Product extends  Component{
             <ModalFooter>
               <Button color="primary" onClick={() => {
                     this.resetVariations()
+              }}>Cài đặt lại</Button>
+              <Button color="secondary" onClick={() => {}}>Cancel</Button>
+            </ModalFooter>
+          </Modal>
+          <Modal isOpen={this.state.showModelChangeIsParentResetVariations} className={'modal-lg'}>
+            <ModalHeader toggle={this.toggleLarge}>
+              <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
+            </ModalHeader>
+            <ModalBody>
+              <MqAlert className="alert alert-warning alert-dismissible alert-styled-left border-top-0 border-bottom-0 border-right-0">
+                <span className="font-weight-semibold">Lưu ý!</span> Bạn sẽ xóa các variations và chuyển sản phẩm thành sản phẩm đơn?
+              </MqAlert>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={() => {
+                this.changeIsParentResetVariation()
               }}>Cài đặt lại</Button>
               <Button color="secondary" onClick={() => {}}>Cancel</Button>
             </ModalFooter>
