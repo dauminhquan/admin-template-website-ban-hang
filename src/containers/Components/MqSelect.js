@@ -27,15 +27,15 @@ class MqSelect extends Component {
   }
   componentDidMount() {
     document.addEventListener('click', this.handleClick)
-    if(this.props.multiple && !this.props.removeItemSelected){
-      console.error('removeItemSelected is required')
-    }
+    // if(this.props.multiple && !this.props.removeItemSelected){
+    //   console.error('removeItemSelected is required')
+    // }
 
     if(this.state.contentShow.length == 0){
       const {values,defaultItemSelected} = this.props
       this.setState(state => {
         state.contentShow = values
-        state.itemSelected = defaultItemSelected
+        state.itemSelected = Object.assign([],defaultItemSelected)
         return state
       })
     }

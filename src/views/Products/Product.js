@@ -149,8 +149,12 @@ class Product extends  Component{
         variations.push(temp)
       }
     })
-    variations = cartesian(...variations)
+    console.log("1",variations)
+    if(variations.length > 1){
+      variations = cartesian(...variations)
+    }
 
+    console.log("2",variations)
     this.setState(state => {
       state.variations = state.variations.concat(variations)
       state.parentOptions = state.parentOptions.map(item => {
@@ -172,8 +176,8 @@ class Product extends  Component{
     })
   }
   selectProductAttribute(attribute){
-    console.log(attribute,this.state.productAttributes)
     const {productAttributes} = this.state
+    console.log(productAttributes)
     if(!productAttributes.find(i => {
       return i.key == attribute.key
     })){
@@ -347,8 +351,9 @@ class Product extends  Component{
     })
   }
   getContentProductParentAttributes(){
+    console.log(this.state.productAttributes)
     return (
-      this.state.productAttributes.length > 0 && this.state.isParent ?
+      (this.state.productAttributes.length > 0 && this.state.isParent) ?
         (
           <fieldset className="mb-3">
             <legend className="text-uppercase font-size-sm font-weight-bold">Variations</legend>
@@ -379,6 +384,7 @@ class Product extends  Component{
     )
   }
   getContentParentOptions(attribute){
+    console.log(attribute,this.state.parentOptions)
     let parentOption = this.state.parentOptions.find(i => {
       return i.attribute.key == attribute.key
     })
@@ -414,7 +420,7 @@ class Product extends  Component{
               <MqSelect
                 multiple
                 values={ATTRIBUTES}
-                itemSelected={this.state.selectProductAttribute}
+                defaultItemSelected={this.state.selectProductAttribute}
                 onChange={(values,item,type)=>{
 
                   if(type == SELECT_ITEM){
