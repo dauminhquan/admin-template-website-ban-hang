@@ -395,9 +395,12 @@ class  Categories extends Component{
                   <table className="table">
                     <thead>
                     <tr>
-                      <th><input type="checkbox" checked={this.state.selectedAll} onChange={e => {
+                      <th><input type="checkbox" checked={this.state.selectedAll && this.state.categories.length > 0} onChange={e => {
                         let checked = e.target.checked
                         this.setState(state => {
+                          if(state.categories.length == 0){
+                            checked = false
+                          }
                           state.selectedAll = checked
                           state.categories.forEach(category => {
                             state.categoriesSelected[category._id] = checked
@@ -412,6 +415,11 @@ class  Categories extends Component{
                     </tr>
                     </thead>
                     <tbody>
+                    {
+                      this.state.categories.length == 0 ? (<tr>
+                        <td colSpan={5} className="text-warning text-center">Không có mục nào để hiển thị</td>
+                      </tr>) : ""
+                    }
                     {
                       this.state.categories.map(category => (
                         <tr>

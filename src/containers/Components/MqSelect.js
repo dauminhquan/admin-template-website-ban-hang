@@ -34,7 +34,7 @@ class MqSelect extends Component {
     if(this.state.contentShow.length == 0){
       const {values,defaultItemSelected} = this.props
       this.setState(state => {
-        state.contentShow = values
+        // state.contentShow = values
         state.itemSelected = Object.assign([],defaultItemSelected)
         return state
       })
@@ -50,7 +50,7 @@ class MqSelect extends Component {
     // console.log("sosanh - truoc",this.props.itemSelected,"moi: ",nextProps.itemSelected)
     // console.log("ok"+this.changedValueSelected(nextProps.itemSelected,this.props.itemSelected))
     // const {itemSelected} = this.state
-    // if(this.changedValueSelected(nextProps.itemSelected,this.props.itemSelected)){
+    // if(this.changedValueSelected(nextProps.values,this.props.values)){
     //   this.setState(state => {
     //     state.itemSelected = nextProps.itemSelected
     //     console.log("state change ",state.itemSelected)
@@ -95,11 +95,7 @@ class MqSelect extends Component {
       })
       this.setState(state => {
         state.contentShow = result
-        return state
-      })
-    }else{
-      this.setState(state => {
-        state.contentShow = values
+        state.searchText = text
         return state
       })
     }
@@ -180,15 +176,17 @@ class MqSelect extends Component {
   getContentResultShow(){
     let results = []
     const {values} = this.props
-    if(this.state.contentShow.length == 0){
-      if(values.length == 0){
-        results.push(<div key={this.wrapperRef.current+'none-result'} className={"dropdown-item-none"}> Không có mục nào để hiện thị</div>)
-      }else{
-        results.push(<div key={this.wrapperRef.current+'none-result'} className={"dropdown-item-none"}> Không có kết quả phù hợp</div>)
-      }
-
-    }else{
-      this.state.contentShow.map(item=> (
+    if(values.length == 0){
+      results.push(<div key={this.wrapperRef.current+'none-result'} className={"dropdown-item-none"}> Không có mục nào để hiện thị</div>)
+    }else if(this.state.contentShow.length != 0){
+      this.state.contentShow.forEach(item=> (
+        results.push(<div key={this.wrapperRef.current+item.key} className={"dropdown-item " + (this.checkItemSelected(item) ? 'mq-item-selected' : '')} onClick={() => {this.selectItem(item)}}> {item.text}</div>)
+      ))
+    }else if(this.state.searchText.trim() != ""){
+      results.push(<div key={this.wrapperRef.current+'none-result'} className={"dropdown-item-none"}> Không có kết quả nào phù hợp</div>)
+    }
+    else{
+      values.forEach(item=> (
         results.push(<div key={this.wrapperRef.current+item.key} className={"dropdown-item " + (this.checkItemSelected(item) ? 'mq-item-selected' : '')} onClick={() => {this.selectItem(item)}}> {item.text}</div>)
       ))
     }
@@ -217,7 +215,7 @@ class MqSelect extends Component {
         }} placeholder={this.props.placeholder}/></div>
       )
     }else {
-      if(this.state.itemSelected.text){
+      if(this.state.itemSelected.text && this.props.values.length > 0){
         searchResult.push(this.state.itemSelected.text)
       }else{
         searchResult.push(<i className="mq-select-placeholder">{this.props.placeholder}</i>)
