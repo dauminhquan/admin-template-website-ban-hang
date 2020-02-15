@@ -37,6 +37,7 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 const Products = React.lazy(() => import('./views/Products/Products'));
+const Categories = React.lazy(() => import('./views/Categories/Categories'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -81,6 +82,7 @@ const routes = [
   { path: '/users', exact: true,  name: 'Users', component: Users },
   { path: '/products', exact: true,  name: 'Products', component: Products },
   { path: '/products/:id', exact: true,  name: 'Product Details', component: Product },
+  { path: '/categories', exact: true,  name: 'Categories', component: Categories },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
 ];
 

@@ -82,7 +82,7 @@ class  DefaultMainSideBar extends Component{
                 </MqNavItemHead>
                 <MqNav className="nav nav-group-sub">
                   <MqNavItem className="nav-item">
-                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý danh mục sản phẩm</MqNavItemHead>
+                    <MqNavItemHead to="/categories" className="nav-link">Quản lý danh mục sản phẩm</MqNavItemHead>
                   </MqNavItem>
                   <MqNavItem className="nav-item">
                     <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý nhà cung cấp</MqNavItemHead>
