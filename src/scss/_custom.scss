@@ -606,6 +606,7 @@
 .table-custom img {
   width: 60px;
 }
+
 .table-custom td.custom-description {
   min-width: 100px;
   max-width: 150px;
@@ -629,6 +630,9 @@
   margin-left: 5px;
 }
 .table-custom thead th {
+  white-space: nowrap;
+}
+.table-no-break thead th{
   white-space: nowrap;
 }
 .table-products thead th {

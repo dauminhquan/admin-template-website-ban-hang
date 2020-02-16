@@ -176,7 +176,6 @@ class Users extends Component {
     }
     return p
   }
-
   getVariation(parent_sku){
     if(!this.state.variations[parent_sku]){
       let variation = this.makeVariations(parent_sku)
@@ -186,7 +185,6 @@ class Users extends Component {
       })
     }
   }
-
   showVariation(parent_sku){
       if(!this.state.variations[parent_sku]){
         this.getVariation(parent_sku)
@@ -200,7 +198,6 @@ class Users extends Component {
         return state
       })
   }
-
   makeVariations(parent_sku){
     let p = []
     for(let i = 0 ; i< 5; i++){
@@ -224,7 +221,6 @@ class Users extends Component {
     }
     return p
   }
-
   sortAction(name){
 
     if(this.state.sort.name == name){
@@ -250,14 +246,12 @@ class Users extends Component {
       })
     }
   }
-
   changeShowColumn(column,checked){
     this.setState(state => {
       state.showColumns[column.name] = checked
       return state
     })
   }
-
   changeSelectProduct(_id,checked){
     const rjs = this
     this.setState(state => {
