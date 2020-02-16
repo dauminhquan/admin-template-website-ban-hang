@@ -433,7 +433,7 @@ class Users extends Component {
                         if(this.state.showColumns[column.name]){
                           if(column.name == 'is_active'){
                             if(item['is_parent'] && !item['parent_sku']){
-                              return (<td key={item._id+cl_index}>
+                              return (<td key={item._id+cl_index} className="td-product-status">
                                 <span className="product-status" onClick={() => {this.showVariation(item.sku)}}><i className={this.state.showVariations[item.sku] ? "icon-arrow-down12" : "icon-arrow-right13"}></i> Variations</span>
                               </td>)
                             }else{

@@ -2,248 +2,295 @@ import React, { Component, lazy, Suspense } from 'react';
 import MqDivDropdown from "../../containers/Components/MqDivDropdown";
 import MqDivDropdownHead from "../../containers/Components/MqDivDropdownHead";
 import MqDivDropdownBody from "../../containers/Components/MqDivDropdownBody";
-import CategoriesHeader from "./CategoriesHeader";
+import SuppliersHeader from "./SuppliersHeader";
 import MqSelect from "../../containers/Components/MqSelect";
 import {Link} from "react-router-dom";
 import MqPagination from "../../containers/Components/MqPagination";
 import MqLoading from "../../containers/Components/MqLoading";
 import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
 import MqAlert from "../../containers/Components/MqAlert";
+import {getBase64, makeId} from "../../helpers";
 const CATEGORIES = [
 
 ]
-function makeid(length) {
-  let result           = '';
-  let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let charactersLength = characters.length;
-  for ( let i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-class  Categories extends Component{
+class  Suppliers extends Component{
   constructor(props) {
     super(props);
     this.state = {
-      categories: [
+      suppliers: [
         {
           _id: "mot",
           name: "Quần",
-          description: "Xin chào",
-          parentCategory: {
-            _id: 3,
-            name: "Quần Áo"
-          }
+          image: "https://zicxa.com/hinh-anh/wp-content/uploads/2019/07/T%E1%BB%95ng-h%E1%BB%A3p-h%C3%ACnh-%E1%BA%A3nh-g%C3%A1i-xinh-d%E1%BB%85-th%C6%B0%C6%A1ng-cute-nh%E1%BA%A5t-6.jpg",
+          phoneNumber: "012345",
+          address: "Hà Nội",
+          description: "Nhà cung cấp quần áo hàng đầu Việt Nam Nhà cung cấp quần áo hàng đầu Việt Nam Nhà cung cấp quần áo hàng đầu Việt Nam" ,
         },
         {
           _id: "hai",
           name: "Áo",
+          image: "https://zicxa.com/hinh-anh/wp-content/uploads/2019/07/T%E1%BB%95ng-h%E1%BB%A3p-h%C3%ACnh-%E1%BA%A3nh-g%C3%A1i-xinh-d%E1%BB%85-th%C6%B0%C6%A1ng-cute-nh%E1%BA%A5t-6.jpg",
+          phoneNumber: "012345",
+          address: "Hà Nội",
           description: "Xin chào",
-          parentCategory: {
-            _id: 3,
-            name: "Quần Áo"
-          }
         },
         {
           _id: "ba",
           name: "Quần Áo",
+          image: "https://zicxa.com/hinh-anh/wp-content/uploads/2019/07/T%E1%BB%95ng-h%E1%BB%A3p-h%C3%ACnh-%E1%BA%A3nh-g%C3%A1i-xinh-d%E1%BB%85-th%C6%B0%C6%A1ng-cute-nh%E1%BA%A5t-6.jpg",
+          phoneNumber: "012345",
+          address: "Hà Nội",
           description: "Xin chào"
         },
         {
           _id: "bon",
           name: "Dày dép",
+          image: "https://zicxa.com/hinh-anh/wp-content/uploads/2019/07/T%E1%BB%95ng-h%E1%BB%A3p-h%C3%ACnh-%E1%BA%A3nh-g%C3%A1i-xinh-d%E1%BB%85-th%C6%B0%C6%A1ng-cute-nh%E1%BA%A5t-6.jpg",
+          phoneNumber: "012345",
+          address: "Hà Nội",
           description: "Xin chào"
         }
       ],
       nextId: "nam",
-      category: {
+      supplier: {
         name: "",
-        parentCategory: null,
-        description: ""
+        image: "",
+        base64: "",
+        description: "",
+        address: "",
+        phoneNumber: ""
       },
-      creatingCategory: false,
-      tempCategory: {
+      creatingSupplier: false,
+      tempSupplier: {
         _id: null,
         name: "",
-        parentCategory: null,
-        description: ""
+        image: "",
+        base64: "",
+        description: "",
+        address: "",
+        phoneNumber: ""
       },
-      showModelEditCategory: false,
-      showModelDeleteCategory: false,
-      showModelDeleteCategories: false,
-      deletingCategory: false,
-      deletingCategories: false,
-      categoriesSelected: [
+      showModelEditSupplier: false,
+      showModelDeleteSupplier: false,
+      showModelDeleteSuppliers: false,
+      deletingSupplier: false,
+      deletingSuppliers: false,
+      suppliersSelected: [
       ],
       selectedAll: false
     }
   }
   componentDidMount() {
     this.setState(state => {
-      state.categories.forEach(category => {
-        state.categoriesSelected[(category._id)] = false
+      state.suppliers.forEach(supplier => {
+        state.suppliersSelected[(supplier._id)] = false
       })
       return state
     })
   }
-  actionEditCategory(_id){
+  actionEditSupplier(_id){
     this.setState(state => {
-      state.tempCategory = state.categories.find(item => {
+      let tempSupplier = state.suppliers.find(item => {
         return item._id == _id
       })
-      state.showModelEditCategory = true
+      state.tempSupplier = Object.assign({},tempSupplier)
+      state.tempSupplier.base64 = state.tempSupplier.image
+      state.tempSupplier.image = null
+      state.showModelEditSupplier = true
       return state
     })
   }
-  actionDeleteCategory(_id){
+  actionDeleteSupplier(_id){
     this.setState(state => {
-      state.tempCategory = state.categories.find(item => {
+      state.tempSupplier = state.suppliers.find(item => {
         return item._id == _id
       })
-      state.showModelDeleteCategory = true
+      state.showModelDeleteSupplier = true
       return state
     })
   }
-  changeNameCategory(name){
+  changeNameSupplier(name){
     this.setState(state => {
-      state.category.name = name
+      state.supplier.name = name
       return state
     })
   }
-  changeParentCategory(parentCategory){
+  changeImageSupplier(file){
     this.setState(state => {
-      state.category.parentCategory = state.categories.find(i => {
-        return i._id == parentCategory.key
+      state.supplier.image = file
+      return state
+    })
+    getBase64(file, (result) => {
+      this.setState(state => {
+        state.supplier.base64 = result
+        return state
       })
+    })
+  }
+  changeAddressSupplier(address){
+    this.setState(state => {
+      state.supplier.address = address
       return state
     })
   }
-  changeDescriptionCategory(description){
+  changePhoneNumberSupplier(phoneNumber){
     this.setState(state => {
-      state.category.description = description
+      state.supplier.phoneNumber = phoneNumber
+      return state
+    })
+  }
+  changeDescriptionSupplier(description){
+    this.setState(state => {
+      state.supplier.description = description
       return state
     })
   }
   changeNameTemp(name){
     this.setState(state => {
-      state.tempCategory.name = name
+      state.tempSupplier.name = name
       return state
     })
   }
-  changeParentTemp(parentCategory){
+  changeImageTemp(file){
     this.setState(state => {
-      state.tempCategory.parentCategory = state.categories.find(i => {
-        return i._id == parentCategory.key
+      state.tempSupplier.image = file
+      return state
+    })
+    getBase64(file, (result) => {
+      this.setState(state => {
+        state.tempSupplier.base64 = result
+        return state
       })
+    })
+  }
+  changeAddressTemp(address){
+    this.setState(state => {
+      state.tempSupplier.address = address
+      return state
+    })
+  }
+  changePhoneNumberTemp(address){
+    this.setState(state => {
+      state.tempSupplier.address = address
       return state
     })
   }
   changeDescriptionTemp(description){
     this.setState(state => {
-      state.tempCategory.description = description
+      state.tempSupplier.description = description
       return state
     })
   }
-  createCategory(){
+  createSupplier(){
     this.setState({
-      creatingCategory: true
+      creatingSupplier: true
     })
       setTimeout(() => {
         this.setState(state => {
-          let newCategory = state.category
-          newCategory._id = makeid(10)
-          state.categories.unshift(newCategory)
-          state.category = {
+          let newSupplier = state.supplier
+          newSupplier.image = newSupplier.base64
+          delete newSupplier.base64
+          newSupplier._id = makeId(10)
+          state.suppliers.unshift(newSupplier)
+          state.supplier = {
             name: "",
-            parentCategory: null,
+            address: "",
+            image: null,
+            phoneNumber: "",
             description: ""
           }
-          state.creatingCategory = null
+          state.creatingSupplier = null
           return state
         })
+        this.refs['create-image'].value = ""
       },3000)
   }
-  updateCategory(){
+  updateSupplier(){
     this.setState({
-      updatingCategory: true
+      updatingSupplier: true
     })
     setTimeout(() => {
       this.setState(state => {
-        state.categories = state.categories.map(category => {
-          if(category._id == state.tempCategory._id){
-            category = state.tempCategory
+        state.suppliers = state.suppliers.map(supplier => {
+          if(supplier._id == state.tempSupplier._id){
+            let temp = Object.assign({},state.tempSupplier)
+            temp.image = temp.base64
+            delete temp.base64
+            supplier = Object.assign({},temp)
           }
-          return category
+          return supplier
         })
-        state.tempCategory = {
+        state.tempSupplier = {
           _id: null,
           name: "",
-          parentCategory: null,
+          image: null,
+          phoneNumber: "",
+          address: "",
           description: ""
         }
-        state.updatingCategory = false
-        state.showModelEditCategory = false
+        state.updatingSupplier = false
+        state.showModelEditSupplier = false
         return state
       })
     },3000)
   }
-  deleteCategory(){
+  deleteSupplier(){
     this.setState({
-      deletingCategory: true
+      deletingSupplier: true
     })
     setTimeout(() => {
       this.setState(state => {
 
-        state.categories = state.categories.filter(category => {
-          return category._id != state.tempCategory._id
+        state.suppliers = state.suppliers.filter(supplier => {
+          return supplier._id != state.tempSupplier._id
         })
-        state.showModelDeleteCategory = false
-        state.deletingCategory = false
+        state.showModelDeleteSupplier = false
+        state.deletingSupplier = false
         return state
       })
     },3000)
   }
-  deleteCategories(){
+  deleteSuppliers(){
     this.setState({
-      deletingCategories: true
+      deletingSuppliers: true
     })
     setTimeout(() => {
       this.setState(state => {
         let ids = []
-        state.categories.forEach(category => {
-          if(!state.categoriesSelected[category._id]){
-            ids.push(category._id)
+        state.suppliers.forEach(supplier => {
+          if(!state.suppliersSelected[supplier._id]){
+            ids.push(supplier._id)
           }
         })
-        state.categories = state.categories.filter(category => {
-          return ids.includes(category._id)
+        state.suppliers = state.suppliers.filter(supplier => {
+          return ids.includes(supplier._id)
         })
-        state.showModelDeleteCategories = false
-        state.deletingCategories = false
+        state.showModelDeleteSuppliers = false
+        state.deletingSuppliers = false
         return state
       })
     },3000)
   }
-  coverCategoriesToMqSelectValuesObject(){
-    return this.state.categories.map(item => {
+  coverSuppliersToMqSelectValuesObject(){
+    return this.state.suppliers.map(item => {
       return {
         key: item._id,
         text: item.name
       }
     })
   }
-  coverCategoryToMqSelectValuesObject(category){
-    if(category){
+  coverSupplierToMqSelectValuesObject(supplier){
+    if(supplier){
       return {
-        key: category._id,
-        text: category.name
+        key: supplier._id,
+        text: supplier.name
       }
     }
     return {}
   }
-  checkSelectedAllItem(categoriesSelected){
-    for(let i = 0 ; i < this.state.categories.length; i++){
-      if(!categoriesSelected[this.state.categories[i]._id]){
+  checkSelectedAllItem(suppliersSelected){
+    for(let i = 0 ; i < this.state.suppliers.length; i++){
+      if(!suppliersSelected[this.state.suppliers[i]._id]){
         return false
       }
     }
@@ -251,50 +298,70 @@ class  Categories extends Component{
   }
   numberItemSelected(){
     let num = 0
-    this.state.categories.forEach(category => {
-      if(this.state.categoriesSelected[category._id]){
+    this.state.suppliers.forEach(supplier => {
+      if(this.state.suppliersSelected[supplier._id]){
         num++
       }
     })
     return num
   }
   render() {
-    const {category,tempCategory} = this.state
+    const {supplier,tempSupplier} = this.state
     return(
       <main>
-        <CategoriesHeader/>
+        <SuppliersHeader/>
         <div className="content">
           <div className="row">
             <div className="col-md-5">
               <div className="card">
                 <div className="card-header header-elements-inline">
-                  <h5 className="card-title">Thêm mới một danh mục</h5>
+                  <h5 className="card-title">Thêm mới một nhà cung cấp</h5>
                 </div>
 
                 <div className="card-body">
                   <form onSubmit={(e) => {
-                    this.createCategory()
+                    this.createSupplier()
                     e.preventDefault()
                   }}>
                     <fieldset className="mb-3">
                       <div className="form-group row">
-                        <label className="col-form-label col-lg-4">Tên danh mục </label>
+                        <label className="col-form-label col-lg-4">Tên nhà cung cấp </label>
                         <div className="col-lg-8">
-                          <input type="text" className="form-control" readOnly={this.state.creatingCategory} value={category.name} onChange={(e) => {
-                              this.changeNameCategory(e.target.value)
+                          <input type="text" className="form-control" readOnly={this.state.creatingSupplier} value={supplier.name} onChange={(e) => {
+                              this.changeNameSupplier(e.target.value)
                           }}
                           required
                           />
                         </div>
                       </div>
                       <div className="form-group row">
-                        <label className="col-form-label col-lg-4">Danh mục </label>
+                        <label className="col-form-label col-lg-4">Hình ảnh </label>
                         <div className="col-lg-8">
-                          <MqSelect onChange={(values,item,type) => {
-                                  this.changeParentCategory(item)
+                          <input type="file" className="form-control" ref="create-image" onChange={(e)=> {
+                            this.changeImageSupplier(e.target.files[0])
+                          }}/>
+                          {this.state.supplier.base64 ? (
+                            <img className="img-80" src={this.state.supplier.base64} alt=""/>
+                          ): ""}
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <label className="col-form-label col-lg-4">Địa chỉ </label>
+                        <div className="col-lg-8">
+                          <input type="text" className="form-control" readOnly={this.state.creatingSupplier} value={supplier.address} onChange={(e) => {
+                            this.changeAddressSupplier(e.target.value)
                           }}
-                                    values={this.coverCategoriesToMqSelectValuesObject()}
-                                    disabled={this.state.creatingCategory}
+                                 required
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <label className="col-form-label col-lg-4">Số điện thoại </label>
+                        <div className="col-lg-8">
+                          <input type="text" className="form-control" readOnly={this.state.creatingSupplier} value={supplier.phoneNumber} onChange={(e) => {
+                            this.changePhoneNumberSupplier(e.target.value)
+                          }}
+                                 required
                           />
                         </div>
                       </div>
@@ -302,9 +369,9 @@ class  Categories extends Component{
                         <label className="col-form-label col-lg-4">Mô tả</label>
                         <div className="col-lg-8">
                           <textarea className="form-control"
-                                    readOnly={this.state.creatingCategory}
-                                    value={category.description} onChange={(e) => {
-                                    this.changeDescriptionCategory(e.target.value)
+                                    readOnly={this.state.creatingSupplier}
+                                    value={supplier.description} onChange={(e) => {
+                                    this.changeDescriptionSupplier(e.target.value)
                           }}
                           />
                         </div>
@@ -312,7 +379,7 @@ class  Categories extends Component{
 
                     </fieldset>
                     {
-                      this.state.creatingCategory ?  <MqLoading/> : ""
+                      this.state.creatingSupplier ?  <MqLoading/> : ""
                     }
 
                     <div className="text-right">
@@ -343,7 +410,7 @@ class  Categories extends Component{
                           <MqDivDropdownBody className="dropdown-menu dropdown-menu-left">
                             <span className="dropdown-item span-button" onClick={() => {
                               this.setState({
-                                showModelDeleteCategories: true
+                                showModelDeleteSuppliers: true
                               })
                             }}><i className="icon-trash-alt"></i> Xóa các mục đã chọn</span>
                           </MqDivDropdownBody>
@@ -371,7 +438,7 @@ class  Categories extends Component{
                       <MqDivDropdownBody className="dropdown-menu dropdown-menu-right dropdown-checkbox-body">
                         {
                           // COLUMNS.map(column => {
-                          //   let id = makeid(5)
+                          //   let id = makeId(5)
                           //   return(
                           //     <div className="dropdown-item" key={id}><input type="checkbox" id={id+'show-column'+column.name} checked={this.state.showColumns[column.name]} onChange={(e) => {
                           //       this.changeShowColumn(column,e.target.checked)
@@ -392,42 +459,44 @@ class  Categories extends Component{
               </div>
               <div className="card">
                 <div className="table-responsive">
-                  <table className="table">
+                  <table className="table table-custom">
                     <thead>
                     <tr>
-                      <th><input type="checkbox" checked={this.state.selectedAll && this.state.categories.length > 0} onChange={e => {
+                      <th><input type="checkbox" checked={this.state.selectedAll && this.state.suppliers.length > 0} onChange={e => {
                         let checked = e.target.checked
                         this.setState(state => {
-                          if(state.categories.length == 0){
+                          if(state.suppliers.length == 0){
                             checked = false
                           }
                           state.selectedAll = checked
-                          state.categories.forEach(category => {
-                            state.categoriesSelected[category._id] = checked
+                          state.suppliers.forEach(supplier => {
+                            state.suppliersSelected[supplier._id] = checked
                           })
                           return state
                         })
                       }} /></th>
-                      <th>Tên danh mục</th>
-                      <th>Danh mục cha</th>
+                      <th>Tên nhà cung cấp</th>
+                      <th>Hình ảnh</th>
+                      <th>Địa chỉ</th>
+                      <th>Số điện thoại</th>
                       <th>Mô tả</th>
                       <th>Thao tác</th>
                     </tr>
                     </thead>
                     <tbody>
                     {
-                      this.state.categories.length == 0 ? (<tr>
+                      this.state.suppliers.length == 0 ? (<tr>
                         <td colSpan={5} className="text-warning text-center">Không có mục nào để hiển thị</td>
                       </tr>) : null
                     }
                     {
-                      this.state.categories.map((category,index) => (
+                      this.state.suppliers.map((supplier,index) => (
                         <tr key={index}>
-                          <td><input type="checkbox" checked={this.state.categoriesSelected[category._id]} onChange={e => {
+                          <td><input type="checkbox" checked={this.state.suppliersSelected[supplier._id]} onChange={e => {
                             let checked = e.target.checked
                             this.setState(state=>{
-                              state.categoriesSelected[category._id] = checked
-                              if(this.checkSelectedAllItem(state.categoriesSelected)){
+                              state.suppliersSelected[supplier._id] = checked
+                              if(this.checkSelectedAllItem(state.suppliersSelected)){
                                 state.selectedAll = true
                               }else{
                                 state.selectedAll = false
@@ -435,16 +504,19 @@ class  Categories extends Component{
                               return state
                             })
                           }}/></td>
-                          <td>{category.name}</td>
-                          <td>{category.parentCategory? category.parentCategory.name: ""}</td>
-
-                          <td>{category.description}</td>
+                          <td>{supplier.name}</td>
+                          <td>
+                            <img src={supplier.image} alt=""/>
+                          </td>
+                          <td>{supplier.address}</td>
+                          <td>{supplier.phoneNumber}</td>
+                          <td className="custom-description">{supplier.description}</td>
                           <td>
                             <button className="btn btn-light" onClick={() => {
-                              this.actionEditCategory(category._id)
+                              this.actionEditSupplier(supplier._id)
                             }}>Sửa</button>
                             <button className="btn btn-danger" onClick={() => {
-                              this.actionDeleteCategory(category._id)
+                              this.actionDeleteSupplier(supplier._id)
                             }}>Xóa</button>
                           </td>
                         </tr>
@@ -468,20 +540,20 @@ class  Categories extends Component{
           </div>
 
         </div>
-        <Modal isOpen={this.state.showModelEditCategory} className={'modal-lg'}>
+        <Modal isOpen={this.state.showModelEditSupplier} className={'modal-lg'}>
           <ModalHeader toggle={this.toggleLarge}>
             <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
           </ModalHeader>
           <form onSubmit={(e) => {
             e.preventDefault()
-            this.updateCategory()
+            this.updateSupplier()
           }}>
           <ModalBody>
               <fieldset className="mb-3">
                 <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Tên danh mục </label>
+                  <label className="col-form-label col-lg-4">Tên nhà cung cấp </label>
                   <div className="col-lg-8">
-                    <input type="text" className="form-control" readOnly={this.state.creatingCategory} value={tempCategory.name} onChange={(e) => {
+                    <input type="text" className="form-control" readOnly={this.state.creatingSupplier} value={tempSupplier.name} onChange={(e) => {
                       this.changeNameTemp(e.target.value)
                     }}
                            required
@@ -489,14 +561,33 @@ class  Categories extends Component{
                   </div>
                 </div>
                 <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Danh mục </label>
+                  <label className="col-form-label col-lg-4">Hình ảnh </label>
                   <div className="col-lg-8">
-                    <MqSelect onChange={(values,item,type) => {
-                      this.changeParentTemp(item)
+                    <input type="file" className="form-control" onChange={(e) => {
+                      this.changeImageTemp(e.target.files[0])
+                    }}/>
+                    {this.state.tempSupplier.base64 ? (
+                      <img className="img-80" src={this.state.tempSupplier.base64} alt=""/>
+                    ): ""}
+                  </div>
+                </div>
+                <div className="form-group row">
+                  <label className="col-form-label col-lg-4">Địa chỉ </label>
+                  <div className="col-lg-8">
+                    <input type="text" className="form-control" readOnly={this.state.creatingSupplier} value={tempSupplier.address} onChange={(e) => {
+                      this.changeAddressTemp(e.target.value)
                     }}
-                              defaultItemSelected={this.coverCategoryToMqSelectValuesObject(tempCategory.parentCategory)}
-                              values={this.coverCategoriesToMqSelectValuesObject()}
-                              disabled={this.state.creatingCategory}
+                           required
+                    />
+                  </div>
+                </div>
+                <div className="form-group row">
+                  <label className="col-form-label col-lg-4">Số điện thoại </label>
+                  <div className="col-lg-8">
+                    <input type="text" className="form-control" readOnly={this.state.creatingSupplier} value={tempSupplier.phoneNumber} onChange={(e) => {
+                      this.changePhoneNumberTemp(e.target.value)
+                    }}
+                           required
                     />
                   </div>
                 </div>
@@ -504,11 +595,11 @@ class  Categories extends Component{
                   <label className="col-form-label col-lg-4">Mô tả</label>
                   <div className="col-lg-8">
                           <textarea className="form-control"
-                                    readOnly={this.state.creatingCategory}
+                                    readOnly={this.state.creatingSupplier}
                                    onChange={(e) => {
                             this.changeDescriptionTemp(e.target.value)
                           }}
-                                    value={tempCategory.description}
+                                    value={tempSupplier.description}
                           >
 
                           </textarea>
@@ -517,27 +608,26 @@ class  Categories extends Component{
 
               </fieldset>
               {
-                this.state.updatingCategory ?  <MqLoading/> : ""
+                this.state.updatingSupplier ?  <MqLoading/> : ""
               }
 
           </ModalBody>
           <ModalFooter>
-            <Button type="submit" color="primary">Cập nhật category</Button>
+            <Button type="submit" color="primary">Cập nhật supplier</Button>
             <Button color="secondary" onClick={() => {
               this.setState({
-                tempCategory: {
+                tempSupplier: {
                   _id: null,
                   name: "",
-                  parentCategory: null,
                   description: ""
                 },
-                showModelEditCategory: false
+                showModelEditSupplier: false
               })
             }}>Hủy</Button>
           </ModalFooter>
           </form>
         </Modal>
-        <Modal isOpen={this.state.showModelDeleteCategory} className={'modal-lg'}>
+        <Modal isOpen={this.state.showModelDeleteSupplier} className={'modal-lg'}>
           <ModalHeader toggle={this.toggleLarge}>
             <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
           </ModalHeader>
@@ -546,21 +636,21 @@ class  Categories extends Component{
               <span className="font-weight-semibold">Lưu ý!</span> Bạn sẽ xóa danh mục vửa chọn?
             </MqAlert>
             {
-              this.state.deletingCategory? <MqLoading/> : ""
+              this.state.deletingSupplier? <MqLoading/> : ""
             }
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={() => {
-              this.deleteCategory()
+              this.deleteSupplier()
             }}>Xóa</Button>
             <Button color="secondary" onClick={() => {
               this.setState({
-                showModelDeleteCategory: false
+                showModelDeleteSupplier: false
               })
             }}>Cancel</Button>
           </ModalFooter>
         </Modal>
-        <Modal isOpen={this.state.showModelDeleteCategories} className={'modal-lg'}>
+        <Modal isOpen={this.state.showModelDeleteSuppliers} className={'modal-lg'}>
           <ModalHeader toggle={this.toggleLarge}>
             <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
           </ModalHeader>
@@ -569,16 +659,16 @@ class  Categories extends Component{
               <span className="font-weight-semibold">Lưu ý!</span> Bạn sẽ xóa danh mục vửa chọn?
             </MqAlert>
             {
-              this.state.deletingCategories? <MqLoading/> : ""
+              this.state.deletingSuppliers? <MqLoading/> : ""
             }
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={() => {
-              this.deleteCategories()
+              this.deleteSuppliers()
             }}>Xóa</Button>
             <Button color="secondary" onClick={() => {
               this.setState({
-                deletingCategories: false
+                deletingSuppliers: false
               })
             }}>Cancel</Button>
           </ModalFooter>
@@ -588,5 +678,5 @@ class  Categories extends Component{
   }
 }
 
-export default Categories
+export default Suppliers
 

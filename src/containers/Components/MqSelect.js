@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from 'prop-types';
+import {makeId} from "../../helpers";
 
 function makeid(length) {
   let result           = '';
@@ -196,9 +197,9 @@ class MqSelect extends Component {
     let searchResult = []
     if(this.props.multiple)
     {
-      this.state.itemSelected.forEach(item =>{
+      this.state.itemSelected.forEach((item,index) =>{
         searchResult.push(
-          <div className="mq-select-head-item" key={makeid(10)+"mq-select-head-item"+item.key}>{item.text} <i className="mi-close mq-select-head-item-icon" onClick={() => {
+          <div className="mq-select-head-item" key={index+"mq-select-head-item"+item.key}>{item.text} <i className="mi-close mq-select-head-item-icon" onClick={() => {
             if(!this.props.disabled){
               this.removeItemSelected(item)
             }
@@ -208,7 +209,7 @@ class MqSelect extends Component {
       })
 
       searchResult.push(
-        <div className="mq-select-head-item-input" key={makeid(5)}><input type="text" readOnly={this.props.disabled ? "disabled": ""} className={this.props.disabled? "mq-select-disabled": ""} onFocus={() => {
+        <div className="mq-select-head-item-input" key={makeId(5)}><input type="text" readOnly={this.props.disabled ? "disabled": ""} className={this.props.disabled? "mq-select-disabled": ""} onFocus={() => {
           if(!this.props.disabled){
             this.focusSearch(true)
           }
@@ -218,7 +219,7 @@ class MqSelect extends Component {
       if(this.state.itemSelected.text && this.props.values.length > 0){
         searchResult.push(this.state.itemSelected.text)
       }else{
-        searchResult.push(<i className="mq-select-placeholder">{this.props.placeholder}</i>)
+        searchResult.push(<i key={makeId(5)} className="mq-select-placeholder">{this.props.placeholder}</i>)
       }
 
     }

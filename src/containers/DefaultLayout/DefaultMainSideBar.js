@@ -82,13 +82,15 @@ class  DefaultMainSideBar extends Component{
                 </MqNavItemHead>
                 <MqNav className="nav nav-group-sub">
                   <MqNavItem className="nav-item">
-                    <MqNavItemHead to="/categories" className="nav-link">Quản lý danh mục sản phẩm</MqNavItemHead>
+                    <MqNavItemHead to="/categories" clicked={() => {
+                      console.log('aaaa')
+                    }} className="nav-link">Quản lý danh mục sản phẩm</MqNavItemHead>
                   </MqNavItem>
                   <MqNavItem className="nav-item">
-                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý nhà cung cấp</MqNavItemHead>
+                    <MqNavItemHead to="/suppliers" className="nav-link">Quản lý nhà cung cấp</MqNavItemHead>
                   </MqNavItem>
                   <MqNavItem className="nav-item">
-                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý danh sách thuộc tính</MqNavItemHead>
+                    <MqNavItemHead to="/attributes" className="nav-link">Quản lý danh sách thuộc tính</MqNavItemHead>
                   </MqNavItem>
                   <MqNavItem className="nav-item">
                     <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý thương hiệu</MqNavItemHead>
@@ -101,7 +103,7 @@ class  DefaultMainSideBar extends Component{
                 </MqNavItemHead>
                 <MqNav className="nav nav-group-sub">
                   <MqNavItem className="nav-item">
-                    <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý chiến dịch</MqNavItemHead>
+                    <MqNavItemHead to="/offers" className="nav-link">Quản lý chiến dịch</MqNavItemHead>
                   </MqNavItem>
                   <MqNavItem className="nav-item">
                     <MqNavItemHead href="../seed/sidebar_none.html" className="nav-link">Quản lý mã giảm giá</MqNavItemHead>

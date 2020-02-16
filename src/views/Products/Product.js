@@ -7,6 +7,7 @@ import MqAlert from "../../containers/Components/MqAlert";
 import SuccessIcon from "../../containers/Components/SuccessIcon";
 import ErrorIcon from "../../containers/Components/ErrorIcon";
 import MqLoading from "../../containers/Components/MqLoading";
+import {getBase64} from "../../helpers";
 const SELECT_ITEM = 1
 const REMOVE_ITEM = -1
 const ATTRIBUTES = [
@@ -103,7 +104,6 @@ class Product extends  Component{
       return state
     })
   }
-
   resetVariations(){
     this.setState(state => {
       state.showModelResetVariations = false
@@ -149,12 +149,10 @@ class Product extends  Component{
         variations.push(temp)
       }
     })
-    console.log("1",variations)
     if(variations.length > 1){
       variations = cartesian(...variations)
     }
 
-    console.log("2",variations)
     this.setState(state => {
       state.variations = state.variations.concat(variations)
       state.parentOptions = state.parentOptions.map(item => {
@@ -351,7 +349,6 @@ class Product extends  Component{
     })
   }
   getContentProductParentAttributes(){
-    console.log(this.state.productAttributes)
     return (
       (this.state.productAttributes.length > 0 && this.state.isParent) ?
         (
@@ -384,7 +381,6 @@ class Product extends  Component{
     )
   }
   getContentParentOptions(attribute){
-    console.log(attribute,this.state.parentOptions)
     let parentOption = this.state.parentOptions.find(i => {
       return i.attribute.key == attribute.key
     })
@@ -461,7 +457,7 @@ class Product extends  Component{
   }
   getBase64Image(file,ref){
     const rjs = this
-    this.getBase64(file, (result) => {
+    getBase64(file, (result) => {
       rjs.setState(state => {
         state.productImages = state.productImages.map(img => {
           if(img.ref == ref){
@@ -473,16 +469,6 @@ class Product extends  Component{
         return state
       })
     })
-  }
-  getBase64(file, cb) {
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = function () {
-      cb(reader.result)
-    };
-    reader.onerror = function (error) {
-      console.log('Error: ', error);
-    };
   }
   getContentImage(image){
     let i = this.state.productImages.find(img => {

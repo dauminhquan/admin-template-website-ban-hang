@@ -2,248 +2,269 @@ import React, { Component, lazy, Suspense } from 'react';
 import MqDivDropdown from "../../containers/Components/MqDivDropdown";
 import MqDivDropdownHead from "../../containers/Components/MqDivDropdownHead";
 import MqDivDropdownBody from "../../containers/Components/MqDivDropdownBody";
-import CategoriesHeader from "./CategoriesHeader";
+import OffersHeader from "./OffersHeader";
 import MqSelect from "../../containers/Components/MqSelect";
 import {Link} from "react-router-dom";
 import MqPagination from "../../containers/Components/MqPagination";
 import MqLoading from "../../containers/Components/MqLoading";
 import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
 import MqAlert from "../../containers/Components/MqAlert";
+import {getBase64, makeId} from "../../helpers";
+import moment from 'moment'
 const CATEGORIES = [
 
 ]
-function makeid(length) {
-  let result           = '';
-  let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let charactersLength = characters.length;
-  for ( let i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-class  Categories extends Component{
+class  Offers extends Component{
   constructor(props) {
     super(props);
     this.state = {
-      categories: [
+      offers: [
         {
           _id: "mot",
-          name: "Quần",
-          description: "Xin chào",
-          parentCategory: {
-            _id: 3,
-            name: "Quần Áo"
-          }
+          name: "Giảm giá tháng 1 đến tháng 2",
+          start: "",
+          end: "",
+          discountType: "value",
+          discount: 5,
+          running: false,
+          description: "Màu sắc sản phẩm" ,
         },
         {
           _id: "hai",
-          name: "Áo",
-          description: "Xin chào",
-          parentCategory: {
-            _id: 3,
-            name: "Quần Áo"
-          }
+          name: "Giảm giá tháng 1 đến tháng 2",
+          startDate: "",
+          endDate: "",
+          discountType: "percent",
+          discount: 5,
+          running: false,
+          description: "Màu sắc sản phẩm" ,
         },
-        {
-          _id: "ba",
-          name: "Quần Áo",
-          description: "Xin chào"
-        },
-        {
-          _id: "bon",
-          name: "Dày dép",
-          description: "Xin chào"
-        }
       ],
-      nextId: "nam",
-      category: {
+      offer: {
         name: "",
-        parentCategory: null,
-        description: ""
+        startDate: "",
+        endDate: "",
+        discountType: "",
+        discount: "",
+        description: "",
       },
-      creatingCategory: false,
-      tempCategory: {
+      creatingOffer: false,
+      tempOffer: {
         _id: null,
         name: "",
-        parentCategory: null,
-        description: ""
+        startDate: "",
+        endDate: "",
+        discountType: "",
+        discount: "",
+        description: "",
       },
-      showModelEditCategory: false,
-      showModelDeleteCategory: false,
-      showModelDeleteCategories: false,
-      deletingCategory: false,
-      deletingCategories: false,
-      categoriesSelected: [
+      showModelEditOffer: false,
+      showModelDeleteOffer: false,
+      showModelDeleteOffers: false,
+      deletingOffer: false,
+      deletingOffers: false,
+      offersSelected: [
       ],
       selectedAll: false
     }
   }
   componentDidMount() {
     this.setState(state => {
-      state.categories.forEach(category => {
-        state.categoriesSelected[(category._id)] = false
+      state.offers.forEach(offer => {
+        state.offersSelected[(offer._id)] = false
       })
       return state
     })
   }
-  actionEditCategory(_id){
+  actionEditOffer(_id){
     this.setState(state => {
-      state.tempCategory = state.categories.find(item => {
+      let tempOffer = state.offers.find(item => {
         return item._id == _id
       })
-      state.showModelEditCategory = true
+      state.tempOffer = Object.assign({},tempOffer)
+      state.showModelEditOffer = true
       return state
     })
   }
-  actionDeleteCategory(_id){
+  actionDeleteOffer(_id){
     this.setState(state => {
-      state.tempCategory = state.categories.find(item => {
+      state.tempOffer = state.offers.find(item => {
         return item._id == _id
       })
-      state.showModelDeleteCategory = true
+      state.showModelDeleteOffer = true
       return state
     })
   }
-  changeNameCategory(name){
+  changeNameOffer(name){
     this.setState(state => {
-      state.category.name = name
+      state.offer.name = name
       return state
     })
   }
-  changeParentCategory(parentCategory){
+  changeStartDateOffer(startDate){
     this.setState(state => {
-      state.category.parentCategory = state.categories.find(i => {
-        return i._id == parentCategory.key
-      })
+      state.offer.startDate = startDate
       return state
     })
   }
-  changeDescriptionCategory(description){
+  changeEndDateOffer(endDate){
     this.setState(state => {
-      state.category.description = description
+      state.offer.endDate = endDate
+      return state
+    })
+  }
+  changeDiscountTypeOffer(discountType){
+    this.setState(state => {
+      state.offer.discountType = discountType
+      return state
+    })
+  }
+  changeDiscountOffer(discount){
+    this.setState(state => {
+      state.offer.discount = discount
+      return state
+    })
+  }
+  changeDescriptionOffer(description){
+    this.setState(state => {
+      state.offer.description = description
       return state
     })
   }
   changeNameTemp(name){
     this.setState(state => {
-      state.tempCategory.name = name
+      state.tempOffer.name = name
       return state
     })
   }
-  changeParentTemp(parentCategory){
+  changeStartDateTemp(startDate){
     this.setState(state => {
-      state.tempCategory.parentCategory = state.categories.find(i => {
-        return i._id == parentCategory.key
-      })
+      state.tempOffer.startDate = startDate
+      return state
+    })
+  }
+  changeEndDateTemp(endDate){
+    this.setState(state => {
+      state.tempOffer.endDate = endDate
+      return state
+    })
+  }
+  changeDiscountTypeTemp(discountType){
+    this.setState(state => {
+      state.tempOffer.discountType = discountType
+      return state
+    })
+  }
+  changeDiscountTemp(discount){
+    this.setState(state => {
+      state.tempOffer.discount = discount
       return state
     })
   }
   changeDescriptionTemp(description){
     this.setState(state => {
-      state.tempCategory.description = description
+      state.tempOffer.description = description
       return state
     })
   }
-  createCategory(){
+  createOffer(){
     this.setState({
-      creatingCategory: true
+      creatingOffer: true
     })
       setTimeout(() => {
         this.setState(state => {
-          let newCategory = state.category
-          newCategory._id = makeid(10)
-          state.categories.unshift(newCategory)
-          state.category = {
+          let newOffer = state.offer
+          newOffer._id = makeId(10)
+          state.offers.unshift(newOffer)
+          state.offer = {
             name: "",
-            parentCategory: null,
             description: ""
           }
-          state.creatingCategory = null
+          state.creatingOffer = null
           return state
         })
       },3000)
   }
-  updateCategory(){
+  updateOffer(){
     this.setState({
-      updatingCategory: true
+      updatingOffer: true
     })
     setTimeout(() => {
       this.setState(state => {
-        state.categories = state.categories.map(category => {
-          if(category._id == state.tempCategory._id){
-            category = state.tempCategory
+        state.offers = state.offers.map(offer => {
+          if(offer._id == state.tempOffer._id){
+            offer = Object.assign({},state.tempOffer)
           }
-          return category
+          return offer
         })
-        state.tempCategory = {
+        state.tempOffer = {
           _id: null,
           name: "",
-          parentCategory: null,
           description: ""
         }
-        state.updatingCategory = false
-        state.showModelEditCategory = false
+        state.updatingOffer = false
+        state.showModelEditOffer = false
         return state
       })
     },3000)
   }
-  deleteCategory(){
+  deleteOffer(){
     this.setState({
-      deletingCategory: true
+      deletingOffer: true
     })
     setTimeout(() => {
       this.setState(state => {
 
-        state.categories = state.categories.filter(category => {
-          return category._id != state.tempCategory._id
+        state.offers = state.offers.filter(offer => {
+          return offer._id != state.tempOffer._id
         })
-        state.showModelDeleteCategory = false
-        state.deletingCategory = false
+        state.showModelDeleteOffer = false
+        state.deletingOffer = false
         return state
       })
     },3000)
   }
-  deleteCategories(){
+  deleteOffers(){
     this.setState({
-      deletingCategories: true
+      deletingOffers: true
     })
     setTimeout(() => {
       this.setState(state => {
         let ids = []
-        state.categories.forEach(category => {
-          if(!state.categoriesSelected[category._id]){
-            ids.push(category._id)
+        state.offers.forEach(offer => {
+          if(!state.offersSelected[offer._id]){
+            ids.push(offer._id)
           }
         })
-        state.categories = state.categories.filter(category => {
-          return ids.includes(category._id)
+        state.offers = state.offers.filter(offer => {
+          return ids.includes(offer._id)
         })
-        state.showModelDeleteCategories = false
-        state.deletingCategories = false
+        state.showModelDeleteOffers = false
+        state.deletingOffers = false
         return state
       })
     },3000)
   }
-  coverCategoriesToMqSelectValuesObject(){
-    return this.state.categories.map(item => {
+  coverOffersToMqSelectValuesObject(){
+    return this.state.offers.map(item => {
       return {
         key: item._id,
         text: item.name
       }
     })
   }
-  coverCategoryToMqSelectValuesObject(category){
-    if(category){
+  coverOfferToMqSelectValuesObject(offer){
+    if(offer){
       return {
-        key: category._id,
-        text: category.name
+        key: offer._id,
+        text: offer.name
       }
     }
     return {}
   }
-  checkSelectedAllItem(categoriesSelected){
-    for(let i = 0 ; i < this.state.categories.length; i++){
-      if(!categoriesSelected[this.state.categories[i]._id]){
+  checkSelectedAllItem(offersSelected){
+    for(let i = 0 ; i < this.state.offers.length; i++){
+      if(!offersSelected[this.state.offers[i]._id]){
         return false
       }
     }
@@ -251,50 +272,80 @@ class  Categories extends Component{
   }
   numberItemSelected(){
     let num = 0
-    this.state.categories.forEach(category => {
-      if(this.state.categoriesSelected[category._id]){
+    this.state.offers.forEach(offer => {
+      if(this.state.offersSelected[offer._id]){
         num++
       }
     })
     return num
   }
   render() {
-    const {category,tempCategory} = this.state
+    const {offer,tempOffer} = this.state
     return(
       <main>
-        <CategoriesHeader/>
+        <OffersHeader/>
         <div className="content">
           <div className="row">
             <div className="col-md-5">
               <div className="card">
                 <div className="card-header header-elements-inline">
-                  <h5 className="card-title">Thêm mới một danh mục</h5>
+                  <h5 className="card-title">Thêm mới một chiến dịch</h5>
                 </div>
 
                 <div className="card-body">
                   <form onSubmit={(e) => {
-                    this.createCategory()
+                    this.createOffer()
                     e.preventDefault()
                   }}>
                     <fieldset className="mb-3">
                       <div className="form-group row">
-                        <label className="col-form-label col-lg-4">Tên danh mục </label>
+                        <label className="col-form-label col-lg-4">Tên chiến dịch </label>
                         <div className="col-lg-8">
-                          <input type="text" className="form-control" readOnly={this.state.creatingCategory} value={category.name} onChange={(e) => {
-                              this.changeNameCategory(e.target.value)
+                          <input type="text" className="form-control" readOnly={this.state.creatingOffer} value={offer.name} onChange={(e) => {
+                              this.changeNameOffer(e.target.value)
                           }}
                           required
                           />
                         </div>
                       </div>
                       <div className="form-group row">
-                        <label className="col-form-label col-lg-4">Danh mục </label>
+                        <label className="col-form-label col-lg-4">Ngày bắt đầu </label>
                         <div className="col-lg-8">
-                          <MqSelect onChange={(values,item,type) => {
-                                  this.changeParentCategory(item)
+                          <input type="datetime-local" className="form-control" readOnly={this.state.creatingOffer} value={offer.startDate} onChange={(e) => {
+                            this.changeStartDateOffer(e.target.value)
                           }}
-                                    values={this.coverCategoriesToMqSelectValuesObject()}
-                                    disabled={this.state.creatingCategory}
+                                 required
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <label className="col-form-label col-lg-4">Ngày kết thúc </label>
+                        <div className="col-lg-8">
+                          <input type="datetime-local" className="form-control" min={offer.startDate ? offer.startDate : ""} readOnly={this.state.creatingOffer} value={offer.endDate} onChange={(e) => {
+                            this.changeEndDateOffer(e.target.value)
+                          }}
+                                 required
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <label className="col-form-label col-lg-4">Loại giảm giá </label>
+                        <div className="col-lg-8">
+                          <select name="" id="" className="form-control" required onChange={(e) => {
+                            this.changeDiscountTypeOffer(e.target.value)
+                          }}>
+                            <option value="percent">Percent</option>
+                            <option value="value">Value</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="form-group row">
+                        <label className="col-form-label col-lg-4">Giá trị </label>
+                        <div className="col-lg-8">
+                          <input type="text" className="form-control" readOnly={this.state.creatingOffer} value={offer.discount} onChange={(e) => {
+                            this.changeDiscountOffer(e.target.value)
+                          }}
+                                 required
                           />
                         </div>
                       </div>
@@ -302,9 +353,9 @@ class  Categories extends Component{
                         <label className="col-form-label col-lg-4">Mô tả</label>
                         <div className="col-lg-8">
                           <textarea className="form-control"
-                                    readOnly={this.state.creatingCategory}
-                                    value={category.description} onChange={(e) => {
-                                    this.changeDescriptionCategory(e.target.value)
+                                    readOnly={this.state.creatingOffer}
+                                    value={offer.description} onChange={(e) => {
+                                    this.changeDescriptionOffer(e.target.value)
                           }}
                           />
                         </div>
@@ -312,7 +363,7 @@ class  Categories extends Component{
 
                     </fieldset>
                     {
-                      this.state.creatingCategory ?  <MqLoading/> : ""
+                      this.state.creatingOffer ?  <MqLoading/> : ""
                     }
 
                     <div className="text-right">
@@ -343,7 +394,7 @@ class  Categories extends Component{
                           <MqDivDropdownBody className="dropdown-menu dropdown-menu-left">
                             <span className="dropdown-item span-button" onClick={() => {
                               this.setState({
-                                showModelDeleteCategories: true
+                                showModelDeleteOffers: true
                               })
                             }}><i className="icon-trash-alt"></i> Xóa các mục đã chọn</span>
                           </MqDivDropdownBody>
@@ -371,7 +422,7 @@ class  Categories extends Component{
                       <MqDivDropdownBody className="dropdown-menu dropdown-menu-right dropdown-checkbox-body">
                         {
                           // COLUMNS.map(column => {
-                          //   let id = makeid(5)
+                          //   let id = makeId(5)
                           //   return(
                           //     <div className="dropdown-item" key={id}><input type="checkbox" id={id+'show-column'+column.name} checked={this.state.showColumns[column.name]} onChange={(e) => {
                           //       this.changeShowColumn(column,e.target.checked)
@@ -392,42 +443,45 @@ class  Categories extends Component{
               </div>
               <div className="card">
                 <div className="table-responsive">
-                  <table className="table">
+                  <table className="table table-custom">
                     <thead>
                     <tr>
-                      <th><input type="checkbox" checked={this.state.selectedAll && this.state.categories.length > 0} onChange={e => {
+                      <th><input type="checkbox" checked={this.state.selectedAll && this.state.offers.length > 0} onChange={e => {
                         let checked = e.target.checked
                         this.setState(state => {
-                          if(state.categories.length == 0){
+                          if(state.offers.length == 0){
                             checked = false
                           }
                           state.selectedAll = checked
-                          state.categories.forEach(category => {
-                            state.categoriesSelected[category._id] = checked
+                          state.offers.forEach(offer => {
+                            state.offersSelected[offer._id] = checked
                           })
                           return state
                         })
                       }} /></th>
-                      <th>Tên danh mục</th>
-                      <th>Danh mục cha</th>
+                      <th>Tên chiến dịch</th>
+                      <th>Ngày bắt đầu</th>
+                      <th>Ngày kết thúc</th>
+                      <th>Loại giảm giá</th>
+                      <th>Giá trị</th>
                       <th>Mô tả</th>
                       <th>Thao tác</th>
                     </tr>
                     </thead>
                     <tbody>
                     {
-                      this.state.categories.length == 0 ? (<tr>
-                        <td colSpan={5} className="text-warning text-center">Không có mục nào để hiển thị</td>
+                      this.state.offers.length == 0 ? (<tr>
+                        <td colSpan={8} className="text-warning text-center">Không có mục nào để hiển thị</td>
                       </tr>) : null
                     }
                     {
-                      this.state.categories.map((category,index) => (
+                      this.state.offers.map((offer,index) => (
                         <tr key={index}>
-                          <td><input type="checkbox" checked={this.state.categoriesSelected[category._id]} onChange={e => {
+                          <td><input type="checkbox" checked={this.state.offersSelected[offer._id]} onChange={e => {
                             let checked = e.target.checked
                             this.setState(state=>{
-                              state.categoriesSelected[category._id] = checked
-                              if(this.checkSelectedAllItem(state.categoriesSelected)){
+                              state.offersSelected[offer._id] = checked
+                              if(this.checkSelectedAllItem(state.offersSelected)){
                                 state.selectedAll = true
                               }else{
                                 state.selectedAll = false
@@ -435,16 +489,18 @@ class  Categories extends Component{
                               return state
                             })
                           }}/></td>
-                          <td>{category.name}</td>
-                          <td>{category.parentCategory? category.parentCategory.name: ""}</td>
-
-                          <td>{category.description}</td>
-                          <td>
+                          <td>{offer.name}</td>
+                          <td className="td-nowrap">{offer.startDate ? moment(offer.startDate).format('LLL') : ""}</td>
+                          <td className="td-nowrap">{offer.endDate ? moment(offer.endDate).format('LLL') : ""}</td>
+                          <td>{offer.discountType}</td>
+                          <td>{offer.discount}</td>
+                          <td className="custom-description">{offer.description}</td>
+                          <td className="table-custom-action">
                             <button className="btn btn-light" onClick={() => {
-                              this.actionEditCategory(category._id)
+                              this.actionEditOffer(offer._id)
                             }}>Sửa</button>
                             <button className="btn btn-danger" onClick={() => {
-                              this.actionDeleteCategory(category._id)
+                              this.actionDeleteOffer(offer._id)
                             }}>Xóa</button>
                           </td>
                         </tr>
@@ -468,20 +524,20 @@ class  Categories extends Component{
           </div>
 
         </div>
-        <Modal isOpen={this.state.showModelEditCategory} className={'modal-lg'}>
+        <Modal isOpen={this.state.showModelEditOffer} className={'modal-lg'}>
           <ModalHeader toggle={this.toggleLarge}>
             <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
           </ModalHeader>
           <form onSubmit={(e) => {
             e.preventDefault()
-            this.updateCategory()
+            this.updateOffer()
           }}>
           <ModalBody>
               <fieldset className="mb-3">
                 <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Tên danh mục </label>
+                  <label className="col-form-label col-lg-4">Tên chiến dịch </label>
                   <div className="col-lg-8">
-                    <input type="text" className="form-control" readOnly={this.state.creatingCategory} value={tempCategory.name} onChange={(e) => {
+                    <input type="text" className="form-control" readOnly={this.state.creatingOffer} value={tempOffer.name} onChange={(e) => {
                       this.changeNameTemp(e.target.value)
                     }}
                            required
@@ -489,14 +545,43 @@ class  Categories extends Component{
                   </div>
                 </div>
                 <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Danh mục </label>
+                  <label className="col-form-label col-lg-4">Ngày bắt đầu </label>
                   <div className="col-lg-8">
-                    <MqSelect onChange={(values,item,type) => {
-                      this.changeParentTemp(item)
+                    <input type="datetime-local" className="form-control" readOnly={this.state.creatingOffer} value={tempOffer.startDate} onChange={(e) => {
+                      this.changeStartDateTemp(e.target.value)
                     }}
-                              defaultItemSelected={this.coverCategoryToMqSelectValuesObject(tempCategory.parentCategory)}
-                              values={this.coverCategoriesToMqSelectValuesObject()}
-                              disabled={this.state.creatingCategory}
+                           required
+                    />
+                  </div>
+                </div>
+                <div className="form-group row">
+                  <label className="col-form-label col-lg-4">Ngày kết thúc </label>
+                  <div className="col-lg-8">
+                    <input type="datetime-local" min={tempOffer.startDate ? tempOffer.startDate : ""} className="form-control" readOnly={this.state.creatingOffer} value={tempOffer.endDate} onChange={(e) => {
+                      this.changeEndDateTemp(e.target.value)
+                    }}
+                           required
+                    />
+                  </div>
+                </div>
+                <div className="form-group row">
+                  <label className="col-form-label col-lg-4">Loại giảm giá </label>
+                  <div className="col-lg-8">
+                    <select name="" id="" className="form-control" required onChange={(e) => {
+                      this.changeDiscountTypeTemp(e.target.value)
+                    }}>
+                      <option value="percent" selected={tempOffer.value == "percent"}>Percent</option>
+                      <option value="value" selected={tempOffer.value == "value"}>Value</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="form-group row">
+                  <label className="col-form-label col-lg-4">Giá trị </label>
+                  <div className="col-lg-8">
+                    <input type="text" className="form-control" readOnly={this.state.creatingOffer} value={tempOffer.discount} onChange={(e) => {
+                      this.changeDiscountTemp(e.target.value)
+                    }}
+                           required
                     />
                   </div>
                 </div>
@@ -504,11 +589,11 @@ class  Categories extends Component{
                   <label className="col-form-label col-lg-4">Mô tả</label>
                   <div className="col-lg-8">
                           <textarea className="form-control"
-                                    readOnly={this.state.creatingCategory}
+                                    readOnly={this.state.creatingOffer}
                                    onChange={(e) => {
                             this.changeDescriptionTemp(e.target.value)
                           }}
-                                    value={tempCategory.description}
+                                    value={tempOffer.description}
                           >
 
                           </textarea>
@@ -517,27 +602,26 @@ class  Categories extends Component{
 
               </fieldset>
               {
-                this.state.updatingCategory ?  <MqLoading/> : ""
+                this.state.updatingOffer ?  <MqLoading/> : ""
               }
 
           </ModalBody>
           <ModalFooter>
-            <Button type="submit" color="primary">Cập nhật category</Button>
+            <Button type="submit" color="primary">Cập nhật offer</Button>
             <Button color="secondary" onClick={() => {
               this.setState({
-                tempCategory: {
+                tempOffer: {
                   _id: null,
                   name: "",
-                  parentCategory: null,
                   description: ""
                 },
-                showModelEditCategory: false
+                showModelEditOffer: false
               })
             }}>Hủy</Button>
           </ModalFooter>
           </form>
         </Modal>
-        <Modal isOpen={this.state.showModelDeleteCategory} className={'modal-lg'}>
+        <Modal isOpen={this.state.showModelDeleteOffer} className={'modal-lg'}>
           <ModalHeader toggle={this.toggleLarge}>
             <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
           </ModalHeader>
@@ -546,21 +630,21 @@ class  Categories extends Component{
               <span className="font-weight-semibold">Lưu ý!</span> Bạn sẽ xóa danh mục vửa chọn?
             </MqAlert>
             {
-              this.state.deletingCategory? <MqLoading/> : ""
+              this.state.deletingOffer? <MqLoading/> : ""
             }
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={() => {
-              this.deleteCategory()
+              this.deleteOffer()
             }}>Xóa</Button>
             <Button color="secondary" onClick={() => {
               this.setState({
-                showModelDeleteCategory: false
+                showModelDeleteOffer: false
               })
             }}>Cancel</Button>
           </ModalFooter>
         </Modal>
-        <Modal isOpen={this.state.showModelDeleteCategories} className={'modal-lg'}>
+        <Modal isOpen={this.state.showModelDeleteOffers} className={'modal-lg'}>
           <ModalHeader toggle={this.toggleLarge}>
             <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
           </ModalHeader>
@@ -569,16 +653,16 @@ class  Categories extends Component{
               <span className="font-weight-semibold">Lưu ý!</span> Bạn sẽ xóa danh mục vửa chọn?
             </MqAlert>
             {
-              this.state.deletingCategories? <MqLoading/> : ""
+              this.state.deletingOffers? <MqLoading/> : ""
             }
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={() => {
-              this.deleteCategories()
+              this.deleteOffers()
             }}>Xóa</Button>
             <Button color="secondary" onClick={() => {
               this.setState({
-                deletingCategories: false
+                deletingOffers: false
               })
             }}>Cancel</Button>
           </ModalFooter>
@@ -588,5 +672,5 @@ class  Categories extends Component{
   }
 }
 
-export default Categories
+export default Offers
 

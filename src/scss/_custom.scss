@@ -603,3 +603,40 @@
 .span-button{
   cursor: pointer;
 }
+.table-custom img {
+  width: 60px;
+}
+.table-custom td.custom-description {
+  min-width: 100px;
+  max-width: 150px;
+}
+.img-64{
+  width: 64px;
+  margin-top: 5px;
+}
+.img-80{
+  width: 80px;
+  margin-top: 5px;
+}
+.img-100{
+  width: 100px;
+  margin-top: 5px;
+}
+.table-custom-action{
+  min-width: 150px;
+}
+.table-custom-action button{
+  margin-left: 5px;
+}
+.table-custom thead th {
+  white-space: nowrap;
+}
+.table-products thead th {
+  white-space: nowrap;
+}
+.td-product-status{
+  white-space: nowrap;
+}
+.td-nowrap{
+  white-space: nowrap;
+}

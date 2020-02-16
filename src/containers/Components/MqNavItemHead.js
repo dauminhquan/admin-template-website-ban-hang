@@ -9,7 +9,14 @@ class MqNavItemHead extends Component{
   render() {
     if(this.props.to){
       return (
-        <Link {...this.props}>
+        <Link {...this.props}
+        onClick={() => {
+          if(this.props.clicked){
+            this.props.clicked()
+          }
+
+        }}
+        >
           {this.props.children}
         </Link>)
     }

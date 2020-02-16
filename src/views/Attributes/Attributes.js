@@ -2,248 +2,203 @@ import React, { Component, lazy, Suspense } from 'react';
 import MqDivDropdown from "../../containers/Components/MqDivDropdown";
 import MqDivDropdownHead from "../../containers/Components/MqDivDropdownHead";
 import MqDivDropdownBody from "../../containers/Components/MqDivDropdownBody";
-import CategoriesHeader from "./CategoriesHeader";
+import AttributesHeader from "./AttributesHeader";
 import MqSelect from "../../containers/Components/MqSelect";
 import {Link} from "react-router-dom";
 import MqPagination from "../../containers/Components/MqPagination";
 import MqLoading from "../../containers/Components/MqLoading";
 import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
 import MqAlert from "../../containers/Components/MqAlert";
+import {getBase64, makeId} from "../../helpers";
 const CATEGORIES = [
 
 ]
-function makeid(length) {
-  let result           = '';
-  let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let charactersLength = characters.length;
-  for ( let i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-class  Categories extends Component{
+class  Attributes extends Component{
   constructor(props) {
     super(props);
     this.state = {
-      categories: [
+      attributes: [
         {
           _id: "mot",
-          name: "Quần",
-          description: "Xin chào",
-          parentCategory: {
-            _id: 3,
-            name: "Quần Áo"
-          }
+          name: "color",
+          description: "Màu sắc sản phẩm" ,
         },
         {
           _id: "hai",
-          name: "Áo",
-          description: "Xin chào",
-          parentCategory: {
-            _id: 3,
-            name: "Quần Áo"
-          }
+          name: "size",
+          description: "Kích cỡ sản phẩm" ,
         },
-        {
-          _id: "ba",
-          name: "Quần Áo",
-          description: "Xin chào"
-        },
-        {
-          _id: "bon",
-          name: "Dày dép",
-          description: "Xin chào"
-        }
       ],
       nextId: "nam",
-      category: {
+      attribute: {
         name: "",
-        parentCategory: null,
-        description: ""
+        description: "",
       },
-      creatingCategory: false,
-      tempCategory: {
+      creatingAttribute: false,
+      tempAttribute: {
         _id: null,
         name: "",
-        parentCategory: null,
         description: ""
       },
-      showModelEditCategory: false,
-      showModelDeleteCategory: false,
-      showModelDeleteCategories: false,
-      deletingCategory: false,
-      deletingCategories: false,
-      categoriesSelected: [
+      showModelEditAttribute: false,
+      showModelDeleteAttribute: false,
+      showModelDeleteAttributes: false,
+      deletingAttribute: false,
+      deletingAttributes: false,
+      attributesSelected: [
       ],
       selectedAll: false
     }
   }
   componentDidMount() {
     this.setState(state => {
-      state.categories.forEach(category => {
-        state.categoriesSelected[(category._id)] = false
+      state.attributes.forEach(attribute => {
+        state.attributesSelected[(attribute._id)] = false
       })
       return state
     })
   }
-  actionEditCategory(_id){
+  actionEditAttribute(_id){
     this.setState(state => {
-      state.tempCategory = state.categories.find(item => {
+      let tempAttribute = state.attributes.find(item => {
         return item._id == _id
       })
-      state.showModelEditCategory = true
+      state.tempAttribute = Object.assign({},tempAttribute)
+      state.showModelEditAttribute = true
       return state
     })
   }
-  actionDeleteCategory(_id){
+  actionDeleteAttribute(_id){
     this.setState(state => {
-      state.tempCategory = state.categories.find(item => {
+      state.tempAttribute = state.attributes.find(item => {
         return item._id == _id
       })
-      state.showModelDeleteCategory = true
+      state.showModelDeleteAttribute = true
       return state
     })
   }
-  changeNameCategory(name){
+  changeNameAttribute(name){
     this.setState(state => {
-      state.category.name = name
+      state.attribute.name = name
       return state
     })
   }
-  changeParentCategory(parentCategory){
+  changeDescriptionAttribute(description){
     this.setState(state => {
-      state.category.parentCategory = state.categories.find(i => {
-        return i._id == parentCategory.key
-      })
-      return state
-    })
-  }
-  changeDescriptionCategory(description){
-    this.setState(state => {
-      state.category.description = description
+      state.attribute.description = description
       return state
     })
   }
   changeNameTemp(name){
     this.setState(state => {
-      state.tempCategory.name = name
-      return state
-    })
-  }
-  changeParentTemp(parentCategory){
-    this.setState(state => {
-      state.tempCategory.parentCategory = state.categories.find(i => {
-        return i._id == parentCategory.key
-      })
+      state.tempAttribute.name = name
       return state
     })
   }
   changeDescriptionTemp(description){
     this.setState(state => {
-      state.tempCategory.description = description
+      state.tempAttribute.description = description
       return state
     })
   }
-  createCategory(){
+  createAttribute(){
     this.setState({
-      creatingCategory: true
+      creatingAttribute: true
     })
       setTimeout(() => {
         this.setState(state => {
-          let newCategory = state.category
-          newCategory._id = makeid(10)
-          state.categories.unshift(newCategory)
-          state.category = {
+          let newAttribute = state.attribute
+          newAttribute._id = makeId(10)
+          state.attributes.unshift(newAttribute)
+          state.attribute = {
             name: "",
-            parentCategory: null,
             description: ""
           }
-          state.creatingCategory = null
+          state.creatingAttribute = null
           return state
         })
       },3000)
   }
-  updateCategory(){
+  updateAttribute(){
     this.setState({
-      updatingCategory: true
+      updatingAttribute: true
     })
     setTimeout(() => {
       this.setState(state => {
-        state.categories = state.categories.map(category => {
-          if(category._id == state.tempCategory._id){
-            category = state.tempCategory
+        state.attributes = state.attributes.map(attribute => {
+          if(attribute._id == state.tempAttribute._id){
+            attribute = Object.assign({},state.tempAttribute)
           }
-          return category
+          return attribute
         })
-        state.tempCategory = {
+        state.tempAttribute = {
           _id: null,
           name: "",
-          parentCategory: null,
           description: ""
         }
-        state.updatingCategory = false
-        state.showModelEditCategory = false
+        state.updatingAttribute = false
+        state.showModelEditAttribute = false
         return state
       })
     },3000)
   }
-  deleteCategory(){
+  deleteAttribute(){
     this.setState({
-      deletingCategory: true
+      deletingAttribute: true
     })
     setTimeout(() => {
       this.setState(state => {
 
-        state.categories = state.categories.filter(category => {
-          return category._id != state.tempCategory._id
+        state.attributes = state.attributes.filter(attribute => {
+          return attribute._id != state.tempAttribute._id
         })
-        state.showModelDeleteCategory = false
-        state.deletingCategory = false
+        state.showModelDeleteAttribute = false
+        state.deletingAttribute = false
         return state
       })
     },3000)
   }
-  deleteCategories(){
+  deleteAttributes(){
     this.setState({
-      deletingCategories: true
+      deletingAttributes: true
     })
     setTimeout(() => {
       this.setState(state => {
         let ids = []
-        state.categories.forEach(category => {
-          if(!state.categoriesSelected[category._id]){
-            ids.push(category._id)
+        state.attributes.forEach(attribute => {
+          if(!state.attributesSelected[attribute._id]){
+            ids.push(attribute._id)
           }
         })
-        state.categories = state.categories.filter(category => {
-          return ids.includes(category._id)
+        state.attributes = state.attributes.filter(attribute => {
+          return ids.includes(attribute._id)
         })
-        state.showModelDeleteCategories = false
-        state.deletingCategories = false
+        state.showModelDeleteAttributes = false
+        state.deletingAttributes = false
         return state
       })
     },3000)
   }
-  coverCategoriesToMqSelectValuesObject(){
-    return this.state.categories.map(item => {
+  coverAttributesToMqSelectValuesObject(){
+    return this.state.attributes.map(item => {
       return {
         key: item._id,
         text: item.name
       }
     })
   }
-  coverCategoryToMqSelectValuesObject(category){
-    if(category){
+  coverAttributeToMqSelectValuesObject(attribute){
+    if(attribute){
       return {
-        key: category._id,
-        text: category.name
+        key: attribute._id,
+        text: attribute.name
       }
     }
     return {}
   }
-  checkSelectedAllItem(categoriesSelected){
-    for(let i = 0 ; i < this.state.categories.length; i++){
-      if(!categoriesSelected[this.state.categories[i]._id]){
+  checkSelectedAllItem(attributesSelected){
+    for(let i = 0 ; i < this.state.attributes.length; i++){
+      if(!attributesSelected[this.state.attributes[i]._id]){
         return false
       }
     }
@@ -251,60 +206,50 @@ class  Categories extends Component{
   }
   numberItemSelected(){
     let num = 0
-    this.state.categories.forEach(category => {
-      if(this.state.categoriesSelected[category._id]){
+    this.state.attributes.forEach(attribute => {
+      if(this.state.attributesSelected[attribute._id]){
         num++
       }
     })
     return num
   }
   render() {
-    const {category,tempCategory} = this.state
+    const {attribute,tempAttribute} = this.state
     return(
       <main>
-        <CategoriesHeader/>
+        <AttributesHeader/>
         <div className="content">
           <div className="row">
             <div className="col-md-5">
               <div className="card">
                 <div className="card-header header-elements-inline">
-                  <h5 className="card-title">Thêm mới một danh mục</h5>
+                  <h5 className="card-title">Thêm mới một nhà cung cấp</h5>
                 </div>
 
                 <div className="card-body">
                   <form onSubmit={(e) => {
-                    this.createCategory()
+                    this.createAttribute()
                     e.preventDefault()
                   }}>
                     <fieldset className="mb-3">
                       <div className="form-group row">
-                        <label className="col-form-label col-lg-4">Tên danh mục </label>
+                        <label className="col-form-label col-lg-4">Tên thuộc tính </label>
                         <div className="col-lg-8">
-                          <input type="text" className="form-control" readOnly={this.state.creatingCategory} value={category.name} onChange={(e) => {
-                              this.changeNameCategory(e.target.value)
+                          <input type="text" className="form-control" readOnly={this.state.creatingAttribute} value={attribute.name} onChange={(e) => {
+                              this.changeNameAttribute(e.target.value)
                           }}
                           required
                           />
                         </div>
                       </div>
-                      <div className="form-group row">
-                        <label className="col-form-label col-lg-4">Danh mục </label>
-                        <div className="col-lg-8">
-                          <MqSelect onChange={(values,item,type) => {
-                                  this.changeParentCategory(item)
-                          }}
-                                    values={this.coverCategoriesToMqSelectValuesObject()}
-                                    disabled={this.state.creatingCategory}
-                          />
-                        </div>
-                      </div>
+
                       <div className="form-group row">
                         <label className="col-form-label col-lg-4">Mô tả</label>
                         <div className="col-lg-8">
                           <textarea className="form-control"
-                                    readOnly={this.state.creatingCategory}
-                                    value={category.description} onChange={(e) => {
-                                    this.changeDescriptionCategory(e.target.value)
+                                    readOnly={this.state.creatingAttribute}
+                                    value={attribute.description} onChange={(e) => {
+                                    this.changeDescriptionAttribute(e.target.value)
                           }}
                           />
                         </div>
@@ -312,7 +257,7 @@ class  Categories extends Component{
 
                     </fieldset>
                     {
-                      this.state.creatingCategory ?  <MqLoading/> : ""
+                      this.state.creatingAttribute ?  <MqLoading/> : ""
                     }
 
                     <div className="text-right">
@@ -343,7 +288,7 @@ class  Categories extends Component{
                           <MqDivDropdownBody className="dropdown-menu dropdown-menu-left">
                             <span className="dropdown-item span-button" onClick={() => {
                               this.setState({
-                                showModelDeleteCategories: true
+                                showModelDeleteAttributes: true
                               })
                             }}><i className="icon-trash-alt"></i> Xóa các mục đã chọn</span>
                           </MqDivDropdownBody>
@@ -371,7 +316,7 @@ class  Categories extends Component{
                       <MqDivDropdownBody className="dropdown-menu dropdown-menu-right dropdown-checkbox-body">
                         {
                           // COLUMNS.map(column => {
-                          //   let id = makeid(5)
+                          //   let id = makeId(5)
                           //   return(
                           //     <div className="dropdown-item" key={id}><input type="checkbox" id={id+'show-column'+column.name} checked={this.state.showColumns[column.name]} onChange={(e) => {
                           //       this.changeShowColumn(column,e.target.checked)
@@ -392,42 +337,41 @@ class  Categories extends Component{
               </div>
               <div className="card">
                 <div className="table-responsive">
-                  <table className="table">
+                  <table className="table table-custom">
                     <thead>
                     <tr>
-                      <th><input type="checkbox" checked={this.state.selectedAll && this.state.categories.length > 0} onChange={e => {
+                      <th><input type="checkbox" checked={this.state.selectedAll && this.state.attributes.length > 0} onChange={e => {
                         let checked = e.target.checked
                         this.setState(state => {
-                          if(state.categories.length == 0){
+                          if(state.attributes.length == 0){
                             checked = false
                           }
                           state.selectedAll = checked
-                          state.categories.forEach(category => {
-                            state.categoriesSelected[category._id] = checked
+                          state.attributes.forEach(attribute => {
+                            state.attributesSelected[attribute._id] = checked
                           })
                           return state
                         })
                       }} /></th>
-                      <th>Tên danh mục</th>
-                      <th>Danh mục cha</th>
+                      <th>Tên thuộc tính</th>
                       <th>Mô tả</th>
                       <th>Thao tác</th>
                     </tr>
                     </thead>
                     <tbody>
                     {
-                      this.state.categories.length == 0 ? (<tr>
+                      this.state.attributes.length == 0 ? (<tr>
                         <td colSpan={5} className="text-warning text-center">Không có mục nào để hiển thị</td>
-                      </tr>) : null
+                      </tr>) : ""
                     }
                     {
-                      this.state.categories.map((category,index) => (
-                        <tr key={index}>
-                          <td><input type="checkbox" checked={this.state.categoriesSelected[category._id]} onChange={e => {
+                      this.state.attributes.map(attribute => (
+                        <tr>
+                          <td><input type="checkbox" checked={this.state.attributesSelected[attribute._id]} onChange={e => {
                             let checked = e.target.checked
                             this.setState(state=>{
-                              state.categoriesSelected[category._id] = checked
-                              if(this.checkSelectedAllItem(state.categoriesSelected)){
+                              state.attributesSelected[attribute._id] = checked
+                              if(this.checkSelectedAllItem(state.attributesSelected)){
                                 state.selectedAll = true
                               }else{
                                 state.selectedAll = false
@@ -435,16 +379,14 @@ class  Categories extends Component{
                               return state
                             })
                           }}/></td>
-                          <td>{category.name}</td>
-                          <td>{category.parentCategory? category.parentCategory.name: ""}</td>
-
-                          <td>{category.description}</td>
+                          <td>{attribute.name}</td>
+                          <td className="custom-description">{attribute.description}</td>
                           <td>
                             <button className="btn btn-light" onClick={() => {
-                              this.actionEditCategory(category._id)
+                              this.actionEditAttribute(attribute._id)
                             }}>Sửa</button>
                             <button className="btn btn-danger" onClick={() => {
-                              this.actionDeleteCategory(category._id)
+                              this.actionDeleteAttribute(attribute._id)
                             }}>Xóa</button>
                           </td>
                         </tr>
@@ -468,20 +410,20 @@ class  Categories extends Component{
           </div>
 
         </div>
-        <Modal isOpen={this.state.showModelEditCategory} className={'modal-lg'}>
+        <Modal isOpen={this.state.showModelEditAttribute} className={'modal-lg'}>
           <ModalHeader toggle={this.toggleLarge}>
             <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
           </ModalHeader>
           <form onSubmit={(e) => {
             e.preventDefault()
-            this.updateCategory()
+            this.updateAttribute()
           }}>
           <ModalBody>
               <fieldset className="mb-3">
                 <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Tên danh mục </label>
+                  <label className="col-form-label col-lg-4">Tên thuộc tính </label>
                   <div className="col-lg-8">
-                    <input type="text" className="form-control" readOnly={this.state.creatingCategory} value={tempCategory.name} onChange={(e) => {
+                    <input type="text" className="form-control" readOnly={this.state.creatingAttribute} value={tempAttribute.name} onChange={(e) => {
                       this.changeNameTemp(e.target.value)
                     }}
                            required
@@ -489,26 +431,14 @@ class  Categories extends Component{
                   </div>
                 </div>
                 <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Danh mục </label>
-                  <div className="col-lg-8">
-                    <MqSelect onChange={(values,item,type) => {
-                      this.changeParentTemp(item)
-                    }}
-                              defaultItemSelected={this.coverCategoryToMqSelectValuesObject(tempCategory.parentCategory)}
-                              values={this.coverCategoriesToMqSelectValuesObject()}
-                              disabled={this.state.creatingCategory}
-                    />
-                  </div>
-                </div>
-                <div className="form-group row">
                   <label className="col-form-label col-lg-4">Mô tả</label>
                   <div className="col-lg-8">
                           <textarea className="form-control"
-                                    readOnly={this.state.creatingCategory}
+                                    readOnly={this.state.creatingAttribute}
                                    onChange={(e) => {
                             this.changeDescriptionTemp(e.target.value)
                           }}
-                                    value={tempCategory.description}
+                                    value={tempAttribute.description}
                           >
 
                           </textarea>
@@ -517,27 +447,26 @@ class  Categories extends Component{
 
               </fieldset>
               {
-                this.state.updatingCategory ?  <MqLoading/> : ""
+                this.state.updatingAttribute ?  <MqLoading/> : ""
               }
 
           </ModalBody>
           <ModalFooter>
-            <Button type="submit" color="primary">Cập nhật category</Button>
+            <Button type="submit" color="primary">Cập nhật attribute</Button>
             <Button color="secondary" onClick={() => {
               this.setState({
-                tempCategory: {
+                tempAttribute: {
                   _id: null,
                   name: "",
-                  parentCategory: null,
                   description: ""
                 },
-                showModelEditCategory: false
+                showModelEditAttribute: false
               })
             }}>Hủy</Button>
           </ModalFooter>
           </form>
         </Modal>
-        <Modal isOpen={this.state.showModelDeleteCategory} className={'modal-lg'}>
+        <Modal isOpen={this.state.showModelDeleteAttribute} className={'modal-lg'}>
           <ModalHeader toggle={this.toggleLarge}>
             <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
           </ModalHeader>
@@ -546,21 +475,21 @@ class  Categories extends Component{
               <span className="font-weight-semibold">Lưu ý!</span> Bạn sẽ xóa danh mục vửa chọn?
             </MqAlert>
             {
-              this.state.deletingCategory? <MqLoading/> : ""
+              this.state.deletingAttribute? <MqLoading/> : ""
             }
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={() => {
-              this.deleteCategory()
+              this.deleteAttribute()
             }}>Xóa</Button>
             <Button color="secondary" onClick={() => {
               this.setState({
-                showModelDeleteCategory: false
+                showModelDeleteAttribute: false
               })
             }}>Cancel</Button>
           </ModalFooter>
         </Modal>
-        <Modal isOpen={this.state.showModelDeleteCategories} className={'modal-lg'}>
+        <Modal isOpen={this.state.showModelDeleteAttributes} className={'modal-lg'}>
           <ModalHeader toggle={this.toggleLarge}>
             <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
           </ModalHeader>
@@ -569,16 +498,16 @@ class  Categories extends Component{
               <span className="font-weight-semibold">Lưu ý!</span> Bạn sẽ xóa danh mục vửa chọn?
             </MqAlert>
             {
-              this.state.deletingCategories? <MqLoading/> : ""
+              this.state.deletingAttributes? <MqLoading/> : ""
             }
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={() => {
-              this.deleteCategories()
+              this.deleteAttributes()
             }}>Xóa</Button>
             <Button color="secondary" onClick={() => {
               this.setState({
-                deletingCategories: false
+                deletingAttributes: false
               })
             }}>Cancel</Button>
           </ModalFooter>
@@ -588,5 +517,5 @@ class  Categories extends Component{
   }
 }
 
-export default Categories
+export default Attributes
 
