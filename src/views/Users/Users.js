@@ -20,7 +20,7 @@ import MqDivDropdownBody from "../../containers/Components/MqDivDropdownBody";
 import MqSelect from "../../containers/Components/MqSelect";
 import MqLoading from "../../containers/Components/MqLoading";
 import MqAlert from "../../containers/Components/MqAlert";
-import {makeId} from "../../helpers";
+import {getBase64, makeId} from "../../helpers";
 
 class Users extends Component {
   constructor(props){
@@ -37,7 +37,7 @@ class Users extends Component {
           postal: '100000',
           role: '1',
           status: "active",
-          avatar: 'https://img.thuthuattinhoc.vn/uploads/2019/01/13/hinh-anh-thien-nhien-de-thuong-lang-man-nhat_104526618.jpg',
+          image: 'https://img.thuthuattinhoc.vn/uploads/2019/01/13/hinh-anh-thien-nhien-de-thuong-lang-man-nhat_104526618.jpg',
           phoneNumber: '037111000222',
           nation: "vn"
         },
@@ -51,7 +51,7 @@ class Users extends Component {
           postal: '100000',
           role: '1',
           status: "active",
-          avatar: 'https://img.thuthuattinhoc.vn/uploads/2019/01/13/hinh-anh-thien-nhien-de-thuong-lang-man-nhat_104526618.jpg',
+          image: 'https://img.thuthuattinhoc.vn/uploads/2019/01/13/hinh-anh-thien-nhien-de-thuong-lang-man-nhat_104526618.jpg',
           phoneNumber: '037111000222',
           nation: "vn"
         },
@@ -65,7 +65,7 @@ class Users extends Component {
           postal: '100000',
           role: '1',
           status: "active",
-          avatar: 'https://img.thuthuattinhoc.vn/uploads/2019/01/13/hinh-anh-thien-nhien-de-thuong-lang-man-nhat_104526618.jpg',
+          image: 'https://img.thuthuattinhoc.vn/uploads/2019/01/13/hinh-anh-thien-nhien-de-thuong-lang-man-nhat_104526618.jpg',
           phoneNumber: '037111000222',
           nation: "vn"
         },
@@ -79,7 +79,7 @@ class Users extends Component {
           postal: '100000',
           role: '1',
           status: "active",
-          avatar: 'https://img.thuthuattinhoc.vn/uploads/2019/01/13/hinh-anh-thien-nhien-de-thuong-lang-man-nhat_104526618.jpg',
+          image: 'https://img.thuthuattinhoc.vn/uploads/2019/01/13/hinh-anh-thien-nhien-de-thuong-lang-man-nhat_104526618.jpg',
           phoneNumber: '037111000222',
           nation: "vn"
         },
@@ -97,9 +97,10 @@ class Users extends Component {
         postal: '',
         role: '',
         status: 0,
-        avatar: '',
+        image: '',
         nation: '',
-        phoneNumber: ''
+        phoneNumber: '',
+        base64: null
       },
       creatingUser: false,
       tempUser: {
@@ -113,7 +114,7 @@ class Users extends Component {
         postal: '',
         role: '',
         status: 0,
-        avatar: '',
+        image: '',
         phoneNumber: ''
       },
       showModelEditUser: false,
@@ -149,9 +150,9 @@ class Users extends Component {
       return state
     })
   }
-  changeAddressUser(adress){
+  changeAddressUser(address){
     this.setState(state => {
-      state.user.adress = adress
+      state.user.address = address
       return state
     })
   }
@@ -161,9 +162,9 @@ class Users extends Component {
       return state
     })
   }
-  changeStateUser(state){
+  changeStateUser(UState){
     this.setState(state => {
-      state.user.state = state
+      state.user.state = UState
       return state
     })
   }
@@ -202,6 +203,18 @@ class Users extends Component {
     this.setState(state => {
       state.tempUser.fullName = fullName
       return state
+    })
+  }
+  changeImageUser(file){
+    this.setState(state => {
+      state.user.image = file
+      return state
+    })
+    getBase64(file, (result) => {
+      this.setState(state => {
+        state.user.base64 = result
+        return state
+      })
     })
   }
   changeEmailTempUser(email){
@@ -326,10 +339,15 @@ class Users extends Component {
     setTimeout(() => {
       this.setState(state => {
         let newUser = state.user
+        newUser.image = newUser.base64
+        delete newUser.base64
         newUser._id = makeId(10)
         state.users.unshift(newUser)
         state.user = {
           name: "",
+          address: "",
+          image: null,
+          phoneNumber: "",
           description: ""
         }
         state.creatingUser = null
@@ -427,6 +445,19 @@ class Users extends Component {
                         </div>
                       </div>
                       <div className="form-group row">
+                        <label className="col-form-label col-lg-4">Avatar </label>
+                        <div className="col-lg-8">
+                          <input type="file" className="form-control" onChange={(e) => {
+                            this.changeImageUser(e.target.files[0])
+                          }}
+
+                          />
+                          {this.state.user.base64 ? (
+                            <img className="img-80" ref="create-image" src={this.state.user.base64} alt=""/>
+                          ): ""}
+                        </div>
+                      </div>
+                      <div className="form-group row">
                         <label className="col-form-label col-lg-4">Email </label>
                         <div className="col-lg-8">
                           <input type="email" className="form-control" readOnly={this.state.creatingUser} value={user.email} onChange={(e) => {
@@ -439,7 +470,7 @@ class Users extends Component {
                       <div className="form-group row">
                         <label className="col-form-label col-lg-4">Số điện thoại </label>
                         <div className="col-lg-8">
-                          <input type="email" className="form-control" readOnly={this.state.creatingUser} value={user.phoneNumber} onChange={(e) => {
+                          <input type="tel" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" placeholder="123-4567-8901"  className="form-control" readOnly={this.state.creatingUser} value={user.phoneNumber} onChange={(e) => {
                             this.changePhoneNumberUser(e.target.value)
                           }}
                                  required
@@ -628,7 +659,7 @@ class Users extends Component {
                           <td>
                             <div className="d-flex align-items-center">
                               <div className="mr-3">
-                                <img src={user.avatar}
+                                <img src={user.image}
                                      className="rounded-circle" width="60" height="60" alt=""/>
                               </div>
                               <div>
