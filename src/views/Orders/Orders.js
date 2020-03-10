@@ -525,7 +525,7 @@ class  Orders extends Component{
                           }}/></td>
                           <td rowSpan={order.products.length}>{order.order_date}</td>
                           <td rowSpan={order.products.length}>
-                            <div><a href="#">{order._id}</a></div>
+                            <div><Link to={"/order-detail/"+order._id}>{order._id}</Link></div>
                             <div>Buyer name:</div>
                             <div>
                               <a href="#">{order.customer.name}</a>
@@ -638,7 +638,7 @@ class  Orders extends Component{
                           }}/></td>
                           <td>{order.order_date}</td>
                           <td>
-                            <div><a href="#">{order._id}</a></div>
+                            <div><div><Link to={"/order-detail/"+order._id}>{order._id}</Link></div></div>
                             <div>Buyer name:</div>
                             <div>
                               <a href="#">{order.customer.name}</a>
