@@ -41,6 +41,8 @@ const Categories = React.lazy(() => import('./views/Categories/Categories'));
 const Suppliers = React.lazy(() => import('./views/Suppliers/Suppliers'));
 const Attributes = React.lazy(() => import('./views/Attributes/Attributes'));
 const Offers = React.lazy(() => import('./views/Offers/Offers'));
+const Orders = React.lazy(() => import('./views/Orders/Orders'));
+const OrderDetail = React.lazy(() => import('./views/Orders/OrderDetail'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -89,6 +91,8 @@ const routes = [
   { path: '/suppliers', exact: true,  name: 'Suppliers', component: Suppliers },
   { path: '/attributes', exact: true,  name: 'Attributes', component: Attributes },
   { path: '/offers', exact: true,  name: 'Offers', component: Offers },
+  { path: '/orders', exact: true,  name: 'Orders', component: Orders },
+  { path: '/order-detail/:id/:action?', exact: true,  name: 'OrderDetail', component: OrderDetail },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
 ];
 

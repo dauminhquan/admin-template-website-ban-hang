@@ -175,7 +175,6 @@ class Product extends  Component{
   }
   selectProductAttribute(attribute){
     const {productAttributes} = this.state
-    console.log(productAttributes)
     if(!productAttributes.find(i => {
       return i.key == attribute.key
     })){
@@ -203,18 +202,15 @@ class Product extends  Component{
               }
           })
         }
-        console.log('sau khi chon',state.productAttributes)
         return state
       })
     }
   }
   removeProductAttribute(attribute){
     this.setState(state => {
-      console.log("truoc",attribute,state.productAttributes)
       state.productAttributes = state.productAttributes.filter(item => {
         return item.key != attribute.key
       })
-      console.log("sau",attribute,state.productAttributes)
       return state
     })
   }

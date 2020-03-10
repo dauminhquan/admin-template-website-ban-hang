@@ -644,3 +644,18 @@
 .td-nowrap{
   white-space: nowrap;
 }
+.table-order td{
+  vertical-align: top !important;
+}
+.table-total-sub{
+  border: none;
+  tr{
+    border: none;
+  }
+  td{
+    padding: 0 !important;
+  }
+}
+.form-group-btn-list{
+  padding-bottom: 10px;
+}
