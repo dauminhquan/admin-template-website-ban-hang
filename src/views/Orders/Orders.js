@@ -24,6 +24,24 @@ const ORDER_STATUS = [
     text: "Unshipped"
   }
 ]
+const SORT_DATE = [
+  {
+    date: 7,
+    text: "7 Ngày qua"
+  },
+  {
+    date: 30,
+    text: "30 Ngày qua"
+  },
+  {
+    date: 60,
+    text: "60 Ngày qua"
+  },
+  {
+    date: 365,
+    text: "365 Ngày qua"
+  }
+]
 class  Orders extends Component{
   constructor(props) {
     super(props);
@@ -97,34 +115,18 @@ class  Orders extends Component{
             type: "Standard",
             predict_time: "20/03/2020"
           },
-          status: "Shipped"
+          status: "Shipped",
         },
       ],
-      nextId: "nam",
-      order: {
-        name: "",
-        image: "",
-        base64: "",
-        description: "",
-        address: "",
-        phoneNumber: ""
-      },
-      creatingOrder: false,
-      tempOrder: {
-        _id: null,
-        name: "",
-        image: "",
-        base64: "",
-        description: "",
-        address: "",
-        phoneNumber: ""
-      },
+
       filter: {
         status: {
           key: "Unshipped",
           text: "Unshipped"
         },
+        sort_date: {
 
+        },
       },
       showModelEditOrder: false,
       showModelCancelOrder: false,
@@ -417,29 +419,41 @@ class  Orders extends Component{
                   placeholder="Chọn loại đơn"
                 />
               </div>
-              <div className="col-md-1">
+              <div className="col-md-2">
                 <MqDivDropdown hideoutclick={1} className="breadcrumb-elements-item dropdown p-0">
                   <MqDivDropdownHead button className="btn btn-light dropdown-toggle float-left">
                     <i className="icon-alarm-check mr-2"></i>
-                    Thời gian
+                    {this.state.filter.sort_date.date ? this.state.filter.sort_date.text : "Thời gian"}
                   </MqDivDropdownHead>
                   <div className="clearfix"></div>
                   <MqDivDropdownBody className="dropdown-menu dropdown-menu-left dropdown-checkbox-body">
-                    <div className="dropdown-item">
-                      7 Ngày qua
-                    </div>
-                    <div className="dropdown-item">
-                      15 Ngày qua
-                    </div>
-                    <div className="dropdown-item">
-                      30 Ngày qua
-                    </div>
-                    <div className="dropdown-item">
-                      60 Ngày qua
-                    </div>
-                    <div className="dropdown-item">
-                      365 Ngày qua
-                    </div>
+                    {
+                      SORT_DATE.map(sd => (
+                        <div className={"dropdown-item"+ (this.state.filter.sort_date.date == sd.date ? " active": "")} onClick={() => {
+                          this.setState(state => {
+                            state.filter.sort_date = sd
+                            return state
+                          })
+                        }}>
+                          {sd.text}
+                        </div>
+                      ))
+                    }
+                    {/*<div className="dropdown-item">*/}
+                    {/*  7 Ngày qua*/}
+                    {/*</div>*/}
+                    {/*<div className="dropdown-item">*/}
+                    {/*  15 Ngày qua*/}
+                    {/*</div>*/}
+                    {/*<div className="dropdown-item">*/}
+                    {/*  30 Ngày qua*/}
+                    {/*</div>*/}
+                    {/*<div className="dropdown-item">*/}
+                    {/*  60 Ngày qua*/}
+                    {/*</div>*/}
+                    {/*<div className="dropdown-item">*/}
+                    {/*  365 Ngày qua*/}
+                    {/*</div>*/}
                   </MqDivDropdownBody>
                 </MqDivDropdown>
               </div>
@@ -529,6 +543,7 @@ class  Orders extends Component{
                             <div>Buyer name:</div>
                             <div>
                               <a href="#">{order.customer.name}</a>
+
                             </div>
                           </td>
                           <td>
@@ -768,139 +783,6 @@ class  Orders extends Component{
           </div>
           <MqPagination className="table-pagination-right pagination align-self-end" onNext={() => {}} choosePage={1} onPrev={() => {}} from={1} to={10}/>
         </div>
-        <Modal isOpen={this.state.showModelEditOrder} className={'modal-lg'}>
-          <ModalHeader toggle={this.toggleLarge}>
-            <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
-          </ModalHeader>
-          <form onSubmit={(e) => {
-            e.preventDefault()
-            this.updateOrder()
-          }}>
-          <ModalBody>
-              <fieldset className="mb-3">
-                <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Tên nhà cung cấp </label>
-                  <div className="col-lg-8">
-                    <input type="text" className="form-control" readOnly={this.state.creatingOrder} value={tempOrder.name} onChange={(e) => {
-                      this.changeNameTemp(e.target.value)
-                    }}
-                           required
-                    />
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Hình ảnh </label>
-                  <div className="col-lg-8">
-                    <input type="file" className="form-control" onChange={(e) => {
-                      this.changeImageTemp(e.target.files[0])
-                    }}/>
-                    {this.state.tempOrder.base64 ? (
-                      <img className="img-80" src={this.state.tempOrder.base64} alt=""/>
-                    ): ""}
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Địa chỉ </label>
-                  <div className="col-lg-8">
-                    <input type="text" className="form-control" readOnly={this.state.creatingOrder} value={tempOrder.address} onChange={(e) => {
-                      this.changeAddressTemp(e.target.value)
-                    }}
-                           required
-                    />
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Số điện thoại </label>
-                  <div className="col-lg-8">
-                    <input type="text" className="form-control" readOnly={this.state.creatingOrder} value={tempOrder.phoneNumber} onChange={(e) => {
-                      this.changePhoneNumberTemp(e.target.value)
-                    }}
-                           required
-                    />
-                  </div>
-                </div>
-                <div className="form-group row">
-                  <label className="col-form-label col-lg-4">Mô tả</label>
-                  <div className="col-lg-8">
-                          <textarea className="form-control"
-                                    readOnly={this.state.creatingOrder}
-                                   onChange={(e) => {
-                            this.changeDescriptionTemp(e.target.value)
-                          }}
-                                    value={tempOrder.description}
-                          >
-
-                          </textarea>
-                  </div>
-                </div>
-
-              </fieldset>
-              {
-                this.state.updatingOrder ?  <MqLoading/> : ""
-              }
-
-          </ModalBody>
-          <ModalFooter>
-            <Button type="submit" color="primary">Cập nhật order</Button>
-            <Button color="secondary" onClick={() => {
-              this.setState({
-                tempOrder: {
-                  _id: null,
-                  name: "",
-                  description: ""
-                },
-                showModelEditOrder: false
-              })
-            }}>Hủy</Button>
-          </ModalFooter>
-          </form>
-        </Modal>
-        <Modal isOpen={this.state.showModelCancelOrder} className={'modal-lg'}>
-          <ModalHeader toggle={this.toggleLarge}>
-            <i className="icon-stack-cancel mr-2"></i> &nbsp;Hủy đơn hàng
-          </ModalHeader>
-          <ModalBody>
-            <MqAlert className="alert alert-warning alert-dismissible alert-styled-left border-top-0 border-bottom-0 border-right-0">
-              <span className="font-weight-semibold">Lưu ý!</span> Bạn đồng ý hủy đơn hàng này chứ?
-            </MqAlert>
-            {
-              this.state.cancelingOrder? <MqLoading/> : ""
-            }
-          </ModalBody>
-          <ModalFooter>
-            <Button color="warning" onClick={() => {
-              this.cancelOrder()
-            }}>Hủy đơn hàng</Button>
-            <Button color="light" onClick={() => {
-              this.setState({
-                showModelCancelOrder: false
-              })
-            }}>Đóng</Button>
-          </ModalFooter>
-        </Modal>
-        <Modal isOpen={this.state.showModelCancelOrders} className={'modal-lg'}>
-          <ModalHeader toggle={this.toggleLarge}>
-            <i className="icon-menu7 mr-2"></i> &nbsp;Modal with icons
-          </ModalHeader>
-          <ModalBody>
-            <MqAlert className="alert alert-warning alert-dismissible alert-styled-left border-top-0 border-bottom-0 border-right-0">
-              <span className="font-weight-semibold">Lưu ý!</span> Bạn sẽ xóa danh mục vửa chọn?
-            </MqAlert>
-            {
-              this.state.cancelingOrders? <MqLoading/> : ""
-            }
-          </ModalBody>
-          <ModalFooter>
-            <Button color="primary" onClick={() => {
-              this.cancelOrders()
-            }}>Xóa</Button>
-            <Button color="secondary" onClick={() => {
-              this.setState({
-                cancelingOrders: false
-              })
-            }}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
       </main>
     )
   }

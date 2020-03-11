@@ -43,6 +43,9 @@ const Attributes = React.lazy(() => import('./views/Attributes/Attributes'));
 const Offers = React.lazy(() => import('./views/Offers/Offers'));
 const Orders = React.lazy(() => import('./views/Orders/Orders'));
 const OrderDetail = React.lazy(() => import('./views/Orders/OrderDetail'));
+const ShippingMethods = React.lazy(() => import('./views/ShippingMethods/ShippingMethods'));
+const GiftCodes = React.lazy(() => import('./views/Offers/GiftCodes'));
+const BuyerMessages = React.lazy(() => import('./views/BuyerMessages/BuyerMessages'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -94,6 +97,9 @@ const routes = [
   { path: '/orders', exact: true,  name: 'Orders', component: Orders },
   { path: '/order-detail/:id/:action?', exact: true,  name: 'OrderDetail', component: OrderDetail },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
+  { path: '/shipping-methods', exact: true, name: 'Shipping Methods', component: ShippingMethods },
+  { path: '/gift-codes', exact: true, name: 'Gift Codes', component: GiftCodes },
+  { path: '/buyer-messages', exact: true, name: 'Buyer Message', component: BuyerMessages },
 ];
 
 export default routes;
